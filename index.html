@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Soleco Apps</title>
+  <meta name="description" content="Accès rapide aux applications métiers Soleco.">
+  <meta name="theme-color" content="#161616">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Soleco Apps">
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/icon-512.png">
+  <style>
+    :root {
+      --bg: #161616;
+      --surface: #1e1e1e;
+      --surface-2: #262626;
+      --text: #ededed;
+      --muted: #a8a8a8;
+      --border: rgba(255,255,255,.10);
+      --border-strong: rgba(255,255,255,.20);
+      --accent: #fcdc49;
+      --accent-weak: rgba(252,220,73,.14);
+      --accent-text: #181818;
+      --radius: 14px;
+      --radius-sm: 9px;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 18px 40px rgba(0,0,0,.35);
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      font-family: var(--font); color: var(--text);
+      background:
+        radial-gradient(1200px 600px at 15% -10%, rgba(252,220,73,.10), transparent 60%),
+        radial-gradient(900px 500px at 110% 0%, rgba(255,120,44,.08), transparent 55%),
+        var(--bg);
+      display: flex; justify-content: center;
+      padding: max(24px, env(safe-area-inset-top)) 20px 40px;
+    }
+    .shell { width: min(100%, 900px); }
+    .hero {
+      display: flex; align-items: center; gap: 16px;
+      padding: 18px 4px 22px;
+    }
+    .hero img { width: 68px; height: 68px; border-radius: 16px; flex: 0 0 68px; object-fit: contain;
+      background: var(--surface); border: 1px solid var(--border); padding: 8px; }
+    .hero h1 { margin: 0; font-size: 26px; letter-spacing: -.02em; }
+    .hero p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+    .grid {
+      display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px;
+    }
+    .tile {
+      display: grid; grid-template-rows: auto auto 1fr auto; gap: 8px;
+      min-height: 168px; padding: 18px;
+      text-decoration: none; color: inherit;
+      background: var(--surface);
+      border: 1px solid var(--border); border-left: 3px solid var(--accent);
+      border-radius: var(--radius); box-shadow: var(--shadow);
+      transition: transform .15s ease, border-color .15s ease;
+    }
+    .tile:hover, .tile:focus-visible {
+      transform: translateY(-2px); border-color: var(--accent); outline: none;
+    }
+    .tile .kicker { font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
+      color: var(--accent); font-weight: 800; }
+    .tile h2 { margin: 0; font-size: 20px; line-height: 1.1; }
+    .tile p { margin: 0; color: var(--muted); font-size: 13px; max-width: 32ch; }
+    .tile .go { display: flex; align-items: center; justify-content: space-between;
+      gap: 10px; font-size: 13px; font-weight: 700; color: #f9e595; }
+    .tile .go .arrow {
+      width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center;
+      background: var(--accent-weak); border: 1px solid var(--border-strong); font-size: 17px;
+    }
+    .tips {
+      margin-top: 18px; padding: 14px 16px;
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+      color: var(--muted); font-size: 13px; line-height: 1.5;
+    }
+    .tips strong { color: var(--text); }
+    @media (max-width: 640px) {
+      .grid { grid-template-columns: 1fr; }
+      .hero h1 { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="hero">
+      <img src="assets/icon-512.png" alt="Soleco">
+      <div>
+        <h1>Soleco Apps</h1>
+        <p>Point d'entrée des applications métiers de l'entreprise.</p>
+      </div>
+    </header>
+
+    <section class="grid" aria-label="Applications">
+      <a class="tile" href="https://script.google.com/macros/s/AKfycbyGdOfUXsMGt3lZPxWCXrmctV77v1wobB08-9IVh-0dceQNHUyhccIXfs6D7CG7bPT2/exec" target="_blank" rel="noopener">
+        <div class="kicker">Référentiel</div>
+        <h2>Base de Données</h2>
+        <p>Sites, tiers, contrats, contacts, postes EDF, codes.</p>
+        <div class="go"><span>Ouvrir</span><span class="arrow">↗</span></div>
+      </a>
+
+      <a class="tile" href="https://script.google.com/macros/s/AKfycbwcfaNmr6KUhHJAm13IcmQlcPlCIjDRYvo7z2nurJRFaP415wC4AeIqghwCYxR2pWrW/exec" target="_blank" rel="noopener">
+        <div class="kicker">EDF</div>
+        <h2>Messages Collationnés</h2>
+        <p>Saisie, clôture et historique des messages collationnés EDF.</p>
+        <div class="go"><span>Ouvrir</span><span class="arrow">↗</span></div>
+      </a>
+
+      <a class="tile" href="https://script.google.com/macros/s/AKfycbxx1Qr9DVQufFyBXRiYYNUz1maP7lJhYNk8SjW-lx_BwFGyDrREWW2T7vg3VeSCP2MELg/exec" target="_blank" rel="noopener">
+        <div class="kicker">Exploitation</div>
+        <h2>GMAO Monitoring</h2>
+        <p>Tickets, pannes, indemnisations, aide au dépannage.</p>
+        <div class="go"><span>Ouvrir</span><span class="arrow">↗</span></div>
+      </a>
+
+      <a class="tile" href="https://script.google.com/macros/s/AKfycbySL_Cc1L9sF6DIC4ZzatjavtruaSea20bUyp9X7Ji80N-BqKXO9WIATDRUoq13wIGF/exec" target="_blank" rel="noopener">
+        <div class="kicker">Suivi</div>
+        <h2>Overview</h2>
+        <p>Vue d'ensemble et suivi Soleco.</p>
+        <div class="go"><span>Ouvrir</span><span class="arrow">↗</span></div>
+      </a>
+    </section>
+
+    <p class="tips">
+      <strong>Ajouter à l'écran d'accueil (iPhone)</strong> : ouvrir cette page dans
+      Safari, bouton Partager, « Sur l'écran d'accueil ». L'icône et le nom Soleco
+      sont repris automatiquement. Sur Firefox / Chrome ordinateur : ⭐ favori ou
+      épingler l'onglet.
+    </p>
+  </main>
+</body>
+</html>
