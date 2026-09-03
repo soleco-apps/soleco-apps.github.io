@@ -25,6 +25,14 @@
       --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
       --shadow: 0 1px 2px rgba(0,0,0,.4), 0 18px 40px rgba(0,0,0,.35);
     }
+    :root[data-theme="light"] {
+      --bg: #f4f5f7; --surface: #ffffff; --surface-2: #eef0f3; --surface-sunk: #f8f9fb;
+      --text: #1c1e21; --muted: #6b7280;
+      --border: rgba(0,0,0,.10); --border-strong: rgba(0,0,0,.22);
+      --accent: #b8860b; --accent-weak: rgba(184,134,11,.12); --accent-text: #ffffff;
+      --ok: #1a7f37; --danger: #c0392b;
+      --shadow: 0 1px 2px rgba(0,0,0,.08), 0 14px 34px rgba(0,0,0,.10);
+    }
     * { box-sizing: border-box; }
     html, body { margin: 0; min-height: 100%; }
     body {
@@ -122,6 +130,7 @@
         <p>Point d'entrée des applications métiers.</p>
       </div>
       <div class="spacer"></div>
+      <button id="themeBtn" class="small" title="Thème clair / sombre" aria-label="Thème">◐</button>
       <div class="who hidden" id="who"></div>
     </header>
 
@@ -129,20 +138,6 @@
 
     <div id="app" class="hidden">
       <section class="grid" id="tiles" aria-label="Applications"></section>
-
-      <h2 class="sec">Autres outils</h2>
-      <section class="grid">
-        <a class="tile" href="https://script.google.com/macros/s/AKfycbxx1Qr9DVQufFyBXRiYYNUz1maP7lJhYNk8SjW-lx_BwFGyDrREWW2T7vg3VeSCP2MELg/exec" target="_blank" rel="noopener">
-          <div class="kicker">Exploitation</div><h3>GMAO Monitoring</h3>
-          <p>Tickets, pannes, indemnisations, aide au dépannage.</p>
-          <div class="go"><span>Ouvrir</span><span class="arrow">↗</span></div>
-        </a>
-        <a class="tile" href="https://script.google.com/macros/s/AKfycbySL_Cc1L9sF6DIC4ZzatjavtruaSea20bUyp9X7Ji80N-BqKXO9WIATDRUoq13wIGF/exec" target="_blank" rel="noopener">
-          <div class="kicker">Suivi</div><h3>Overview</h3>
-          <p>Vue d'ensemble et suivi Soleco.</p>
-          <div class="go"><span>Ouvrir</span><span class="arrow">↗</span></div>
-        </a>
-      </section>
 
       <div id="admin" class="hidden">
         <h2 class="sec">Aperçu — ce que voit un compte</h2>
@@ -159,6 +154,16 @@
   <dialog id="dlg"></dialog>
 
   <script>
+  (function () {
+    var root = document.documentElement, saved = null;
+    try { saved = localStorage.getItem('soleco-theme'); } catch (e) {}
+    if (saved === 'light' || saved === 'dark') root.setAttribute('data-theme', saved);
+    document.getElementById('themeBtn').addEventListener('click', function () {
+      var next = (root.getAttribute('data-theme') === 'light') ? 'dark' : 'light';
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem('soleco-theme', next); } catch (e) {}
+    });
+  })();
   (function () {
     'use strict';
     var SB = 'https://bsrijihrkhhhhfnngryl.supabase.co';
@@ -379,26 +384,29 @@
       $('#w-out', w).addEventListener('click', logout);
     }
 
-    var DESC = {
-      BDD: 'Sites, tiers, contrats, contacts, postes EDF, codes.',
-      MSG_EDF: 'Saisie, clôture et historique des messages collationnés EDF.'
+    var META = {
+      BDD:      { kicker: 'Référentiel',  desc: 'Sites, tiers, contrats, contacts, postes EDF, codes.' },
+      MSG_EDF:  { kicker: 'EDF',          desc: 'Saisie, clôture et historique des messages collationnés EDF.' },
+      GMAO:     { kicker: 'Exploitation', desc: 'Tickets, pannes, indemnisations, aide au dépannage.' },
+      OVERVIEW: { kicker: 'Suivi',        desc: "Vue d'ensemble et suivi Soleco." }
     };
-    var KICK = { BDD: 'Référentiel', MSG_EDF: 'EDF' };
     function renderTiles(apps) {
       var list = apps.filter(function (a) { return a.code !== APP && a.url; });
       var g = $('#tiles');
       if (!list.length) { g.innerHTML = '<p class="sub">Aucune application ne t\'est attribuée pour le moment.</p>'; return; }
       g.innerHTML = list.map(function (a) {
+        var m = META[a.code] || {};
         return '<button class="tile" data-code="' + esc(a.code) + '">' +
-          '<div class="kicker">' + esc(KICK[a.code] || 'Outil') + '</div>' +
+          '<div class="kicker">' + esc(m.kicker || 'Outil') + '</div>' +
           '<h3>' + esc(a.libelle) + '</h3>' +
-          '<p>' + esc(DESC[a.code] || '') + '</p>' +
+          '<p>' + esc(m.desc || '') + '</p>' +
           '<div class="go"><span>Ouvrir</span><span class="arrow">↗</span></div></button>';
       }).join('');
       [].forEach.call(g.querySelectorAll('[data-code]'), function (b) {
         b.addEventListener('click', function () {
           var code = b.getAttribute('data-code');
           var app = list.filter(function (x) { return x.code === code; })[0];
+          if (!app.relais) { window.open(app.url, '_blank', 'noopener'); return; }
           setStatus('Ouverture…'); b.disabled = true;
           rpc('jeton_relais', { p_token: TOKEN, p_app_cible: code }).then(function (r) {
             setStatus(''); b.disabled = false;
@@ -464,7 +472,8 @@
           '<p style="margin:0 0 10px">' + pills(vis, 'ok') + '</p>' +
           '<p style="margin:0 0 4px"><b>Masquées</b></p>' +
           '<p style="margin:0 0 10px">' + pills(cache, '') + '</p>' +
-          '<p class="sub" style="margin:0">« Autres outils » (GMAO, Overview) : visibles par tous, ce sont de simples liens.</p>';
+          '<p class="sub" style="margin:0">Réglage par appli dans « Administration — applications » ' +
+          '(ouvert par défaut / accès sur attribution).</p>';
       }
       $('#ap-u', host).addEventListener('change', draw);
       draw();
@@ -493,7 +502,7 @@
       host.innerHTML =
         (attente.length ? '<p class="err" style="margin:0 0 6px">' + attente.length + ' compte(s) en attente de validation</p>' + tbl(attente) + '<div style="height:12px"></div>' : '') +
         '<div class="row" style="margin-bottom:8px;justify-content:flex-end;gap:8px">' +
-        '<button class="small" id="c-tech">Créer les comptes techniciens Soleco…</button>' +
+        '<button class="small" id="c-tech">Créer des comptes techniciens…</button>' +
         '<button class="small primary" id="c-new">+ Nouveau compte</button></div>' +
         tbl(actifs);
       $('#c-new', host).addEventListener('click', function () { editCompte(null); });
@@ -578,35 +587,61 @@
     }
 
     function modalTech() {
-      var d = dlg('<h2 style="margin-top:0">Comptes techniciens Soleco</h2>' +
-        '<p class="sub">Crée un compte (non validé, lecteur N2) pour chaque contact technicien rattaché à SOLECO sans compte.</p>' +
-        '<div id="t-res" class="sub">Analyse…</div>' +
+      var d = dlg('<h2 style="margin-top:0">Créer des comptes techniciens</h2>' +
+        '<p class="sub">Coche les sociétés à importer. Un compte non validé (lecteur N2) ' +
+        'est créé pour chaque technicien avec une adresse e-mail et sans compte.</p>' +
+        '<div id="t-liste" class="sub">Analyse…</div>' +
+        '<p class="err" id="t-err"></p>' +
         '<div style="margin-top:12px;text-align:right"><button data-x>Fermer</button> ' +
         '<button class="primary" id="t-go" disabled>Créer</button></div>');
-      var go = $('#t-go', d);
-      function show(r) {
-        $('#t-res', d).innerHTML = '<b>' + r.a_creer + '</b> à créer · ' + r.deja_en_place + ' déjà en place · ' + r.sans_email + ' sans e-mail';
-        go.disabled = !r.a_creer;
+      var go = $('#t-go', d), groupes = [];
+      function ids() {
+        return [].map.call(d.querySelectorAll('[data-g]:checked'), function (c) { return c.getAttribute('data-g'); });
       }
-      rpc('admin_creer_comptes_techniciens', { p_token: TOKEN, p_dry_run: true }).then(show)
-        .catch(function (e) { $('#t-res', d).textContent = e.message; });
+      function recalc() {
+        var n = ids().reduce(function (s, id) {
+          var g = groupes.filter(function (x) { return String(x.tiers_id || '') === id; })[0];
+          return s + (g ? g.a_creer : 0);
+        }, 0);
+        go.disabled = !n;
+        go.textContent = n ? ('Créer ' + n + ' compte(s)') : 'Créer';
+      }
+      rpc('admin_techniciens_groupes', { p_token: TOKEN }).then(function (rows) {
+        groupes = rows || [];
+        if (!groupes.length) { $('#t-liste', d).textContent = 'Aucun technicien référencé.'; return; }
+        $('#t-liste', d).innerHTML =
+          '<table style="margin-top:6px"><thead><tr><th></th><th>Société</th>' +
+          '<th style="text-align:center">À créer</th><th style="text-align:center">Déjà</th>' +
+          '<th style="text-align:center">Sans e-mail</th></tr></thead><tbody>' +
+          groupes.map(function (g) {
+            var ok = g.a_creer > 0;
+            return '<tr><td><input type="checkbox" data-g="' + esc(String(g.tiers_id || '')) + '"' +
+              (ok ? '' : ' disabled') + ' style="width:auto"></td><td>' + esc(g.societe) + '</td>' +
+              '<td style="text-align:center">' + (ok ? '<b>' + g.a_creer + '</b>' : '0') + '</td>' +
+              '<td style="text-align:center">' + g.deja + '</td>' +
+              '<td style="text-align:center">' + g.sans_email + '</td></tr>';
+          }).join('') + '</tbody></table>';
+        d.querySelectorAll('[data-g]').forEach(function (c) { c.addEventListener('change', recalc); });
+      }).catch(function (e) { $('#t-liste', d).textContent = e.message; });
       go.addEventListener('click', function () {
-        go.disabled = true;
-        rpc('admin_creer_comptes_techniciens', { p_token: TOKEN, p_dry_run: false }).then(function (r) {
-          d.close(); renderAdmin();
-        }).catch(function (e) { $('#t-res', d).textContent = e.message; go.disabled = false; });
+        var g = ids(); if (!g.length) return;
+        go.disabled = true; $('#t-err', d).textContent = '';
+        rpc('admin_creer_comptes_techniciens', { p_token: TOKEN, p_groupes: g, p_dry_run: false })
+          .then(function () { d.close(); renderAdmin(); })
+          .catch(function (e) { $('#t-err', d).textContent = e.message; go.disabled = false; });
       });
     }
 
     function renderApps() {
       var host = $('#adminApps');
       host.innerHTML = '<div class="tablewrap"><table><thead><tr><th>Code</th><th>Libellé</th><th>URL</th>' +
-        '<th>Ouvert&nbsp;défaut</th><th>Actif</th></tr></thead><tbody>' +
+        '<th>Ouvert&nbsp;défaut</th><th title="Consomme le relais de session ?h=">Relais</th><th>Actif</th></tr></thead><tbody>' +
         APPS_.map(function (a) {
           return '<tr data-k="' + esc(a.code) + '"><td><code>' + esc(a.code) + '</code></td>' +
             '<td><input data-c="libelle" value="' + esc(a.libelle) + '"></td>' +
             '<td><input data-c="url" value="' + esc(a.url || '') + '"></td>' +
             '<td style="text-align:center"><input type="checkbox" data-c="ouvert_par_defaut" style="width:auto"' + (a.ouvert_par_defaut ? ' checked' : '') + '></td>' +
+            '<td style="text-align:center"><input type="checkbox" data-c="relais" style="width:auto"' + (a.relais ? ' checked' : '') + '></td>' +
             '<td style="text-align:center"><input type="checkbox" data-c="actif" style="width:auto"' + (a.actif ? ' checked' : '') + '></td></tr>';
         }).join('') + '</tbody></table></div>' +
         '<div class="row" style="margin-top:8px;gap:8px"><input id="na-code" placeholder="CODE" style="max-width:120px">' +
