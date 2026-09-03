@@ -222,7 +222,7 @@
   <dialog id="dlg"></dialog>
 
   <script>
-  var VERSION = 'v1.4.0';
+  var VERSION = 'v1.5.0';
   var FONTS = {
     'Système': '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif',
     'Inter': '"Inter", system-ui, sans-serif',
@@ -616,13 +616,13 @@
     }
 
     /* ---------- administration ---------- */
-    var APPS_ = [];
+    var APPS_ = [], USERS_ = [];
     function renderAdmin() {
       Promise.all([
         rpc('admin_utilisateurs', { p_token: TOKEN }),
         rpc('admin_applications', { p_token: TOKEN })
       ]).then(function (res) {
-        var users = res[0] || []; APPS_ = res[1] || [];
+        var users = res[0] || []; APPS_ = res[1] || []; USERS_ = users;
         renderApercu(users); renderComptes(users); renderApps();
       }).catch(function (e) { $('#adminComptes').innerHTML = '<p class="err">' + esc(e.message) + '</p>'; });
     }
@@ -841,9 +841,11 @@
 
     function renderApps() {
       var host = $('#adminApps');
-      host.innerHTML = '<p class="sub" style="margin:0 0 12px">Le « quoi » de chaque application. Couleur, groupe et ordre d\'affichage se règlent dans <b>Gestion de la page</b>.</p>' +
+      host.innerHTML = '<p class="sub" style="margin:0 0 12px">Le « quoi » de chaque application. Couleur, groupe et ordre d\'affichage se règlent dans <b>Gestion de la page</b>. ' +
+        'Une appli ajoutée ici est <b>restreinte par défaut</b> : personne n\'y a accès tant qu\'un admin ne l\'attribue pas (bouton <b>Accès…</b>) ou ne coche pas « Ouvert à tous ».</p>' +
         '<div class="tablewrap"><table><thead><tr><th>Code</th><th>Libellé</th><th>Kicker</th>' +
-        '<th>Description</th><th>URL</th><th>Ouvert</th><th title="Relais de session ?h=">Relais</th><th>Actif</th></tr></thead><tbody>' +
+        '<th>Description</th><th>URL</th><th title="Visible par TOUS les comptes sans attribution individuelle">Ouvert à tous</th>' +
+        '<th title="Relais de session ?h=">Relais</th><th>Actif</th><th>Accès</th></tr></thead><tbody>' +
         APPS_.map(function (a) {
           return '<tr data-k="' + esc(a.code) + '"><td><code>' + esc(a.code) + '</code></td>' +
             '<td><input data-c="libelle" value="' + esc(a.libelle) + '" style="min-width:110px"></td>' +
@@ -852,12 +854,17 @@
             '<td><input data-c="url" value="' + esc(a.url || '') + '" style="min-width:150px"></td>' +
             '<td style="text-align:center"><input type="checkbox" data-c="ouvert_par_defaut"' + (a.ouvert_par_defaut ? ' checked' : '') + '></td>' +
             '<td style="text-align:center"><input type="checkbox" data-c="relais"' + (a.relais ? ' checked' : '') + '></td>' +
-            '<td style="text-align:center"><input type="checkbox" data-c="actif"' + (a.actif ? ' checked' : '') + '></td></tr>';
+            '<td style="text-align:center"><input type="checkbox" data-c="actif"' + (a.actif ? ' checked' : '') + '></td>' +
+            '<td style="text-align:center">' + (a.code === APP ? '<span class="sub">—</span>' :
+              '<button class="small" data-acc="' + esc(a.code) + '">Accès…</button>') + '</td></tr>';
         }).join('') + '</tbody></table></div>' +
         '<div class="row" style="margin-top:8px;gap:8px"><input id="na-code" placeholder="CODE" style="max-width:120px">' +
         '<input id="na-lib" placeholder="Libellé" style="max-width:220px">' +
         '<button class="small" id="na-add">+ Ajouter</button>' +
         '<span style="flex:1"></span><button class="small primary" id="a-save">Enregistrer</button></div>';
+      host.querySelectorAll('[data-acc]').forEach(function (b) {
+        b.addEventListener('click', function () { ouvrirAcces(b.getAttribute('data-acc')); });
+      });
       $('#a-save', host).addEventListener('click', function () {
         var byK = {};
         host.querySelectorAll('[data-k] [data-c]').forEach(function (el) {
@@ -875,6 +882,82 @@
         if (!code) return;
         rpc('admin_maj_application', { p_token: TOKEN, p_code: code, p_donnees: { libelle: $('#na-lib', host).value || code } })
           .then(renderAdmin).catch(function (e) { alert(e.message); });
+      });
+    }
+
+    function ouvrirAcces(code) {
+      var app = APPS_.filter(function (a) { return a.code === code; })[0];
+      if (!app) return;
+      var comptes = USERS_.filter(function (u) { return u.role !== 'admin'; });
+      function effectif(u, ouvert) {
+        var o = (u.applications || {})[code];
+        return (o === undefined || o === null) ? ouvert : o;
+      }
+      function soc(u) { return u.contact_societe || (u.role === 'technicien' ? 'Techniciens' : '—'); }
+      var groupes = {};
+      comptes.forEach(function (u) { (groupes[soc(u)] = groupes[soc(u)] || []).push(u); });
+      var noms = Object.keys(groupes).sort(function (a, b) { return a === '—' ? 1 : b === '—' ? -1 : a.localeCompare(b); });
+
+      var d = dlg(
+        '<h2 class="sec">Accès — ' + esc(app.libelle) + '</h2>' +
+        '<label class="row" style="gap:8px;font-size:13px"><input type="checkbox" id="ac-open"' + (app.ouvert_par_defaut ? ' checked' : '') + '>' +
+          '<span>Ouvert à tous par défaut <span class="sub">(coché : tout le monde y accède · décoché : seuls les comptes cochés)</span></span></label>' +
+        '<div class="row" style="gap:6px;margin:12px 0 6px"><input id="ac-q" placeholder="Filtrer un compte…" style="flex:1">' +
+          '<button class="small" id="ac-all">Tout cocher</button><button class="small" id="ac-none">Tout décocher</button></div>' +
+        '<div id="ac-list" style="max-height:46vh;overflow:auto;border:1px solid var(--border);border-radius:8px;padding:6px">' +
+          noms.map(function (n) {
+            return '<div class="ac-grp" data-grp="' + esc(n) + '"><label class="row" style="gap:6px;font-weight:700;font-size:12px;color:var(--muted);margin:6px 4px 3px">' +
+              '<input type="checkbox" data-grpall="' + esc(n) + '"> ' + esc(n) + '</label>' +
+              groupes[n].map(function (u) {
+                return '<label class="row ac-row" style="gap:8px;font-size:13px;padding:3px 6px">' +
+                  '<input type="checkbox" data-acu="' + esc(u.login) + '"' + (effectif(u, app.ouvert_par_defaut) ? ' checked' : '') + '>' +
+                  '<span>' + esc(u.nom || u.login) + ' <span class="sub">' + esc(u.login) + ' · ' + esc(u.role) + (u.valide ? '' : ' · à valider') + '</span></span></label>';
+              }).join('') + '</div>';
+          }).join('') +
+        '</div>' +
+        '<p class="err" id="ac-err"></p>' +
+        '<div class="row" style="margin-top:14px;gap:8px"><button class="small" data-x>Annuler</button>' +
+          '<span style="flex:1"></span><button class="primary" id="ac-save">Enregistrer</button></div>'
+      );
+      var list = $('#ac-list', d);
+      function visibles() {
+        return [].filter.call(list.querySelectorAll('[data-acu]'), function (b) { return !b.closest('.ac-row').classList.contains('hidden'); });
+      }
+      $('#ac-all', d).addEventListener('click', function () { visibles().forEach(function (b) { b.checked = true; }); });
+      $('#ac-none', d).addEventListener('click', function () { visibles().forEach(function (b) { b.checked = false; }); });
+      list.querySelectorAll('[data-grpall]').forEach(function (g) {
+        g.addEventListener('change', function () {
+          list.querySelectorAll('[data-grp="' + g.getAttribute('data-grpall') + '"] [data-acu]').forEach(function (b) {
+            if (!b.closest('.ac-row').classList.contains('hidden')) b.checked = g.checked;
+          });
+        });
+      });
+      $('#ac-q', d).addEventListener('input', function () {
+        var q = this.value.toLowerCase();
+        list.querySelectorAll('.ac-row').forEach(function (r) {
+          r.classList.toggle('hidden', !!q && r.textContent.toLowerCase().indexOf(q) < 0);
+        });
+        list.querySelectorAll('.ac-grp').forEach(function (gr) {
+          var any = [].some.call(gr.querySelectorAll('.ac-row'), function (r) { return !r.classList.contains('hidden'); });
+          gr.classList.toggle('hidden', !any);
+        });
+      });
+      $('#ac-save', d).addEventListener('click', function () {
+        var ouvert = $('#ac-open', d).checked, acces = {};
+        comptes.forEach(function (u) {
+          var b = list.querySelector('[data-acu="' + u.login + '"]');
+          var desired = b ? b.checked : effectif(u, app.ouvert_par_defaut);
+          var cur = (u.applications || {})[code];               // undefined | true | false
+          var cible = (desired === ouvert) ? null : desired;     // suit le défaut -> on retire l'override
+          if ((cur === undefined ? null : cur) !== cible) acces[u.login] = cible;
+        });
+        var ops = [];
+        if (ouvert !== app.ouvert_par_defaut) ops.push(rpc('admin_maj_application', { p_token: TOKEN, p_code: code, p_donnees: { ouvert_par_defaut: ouvert } }));
+        if (Object.keys(acces).length) ops.push(rpc('admin_maj_acces_application', { p_token: TOKEN, p_app: code, p_acces: acces }));
+        if (!ops.length) { d.close(); return; }
+        setStatus('Enregistrement…');
+        Promise.all(ops).then(function () { setStatus(''); d.close(); renderAdmin(); })
+          .catch(function (e) { setStatus(''); $('#ac-err', d).textContent = e.message; });
       });
     }
 
