@@ -4,7 +4,6 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex">
-  <meta http-equiv="refresh" content="2;url=/">
   <title>Facturation - Soleco Apps</title>
   <style>
     :root { --bg:#161616; --surface:#1e1e1e; --text:#ededed; --muted:#a8a8a8; --accent:#fcdc49; --border:rgba(255,255,255,.10); font-family:Arial, sans-serif; }
@@ -19,10 +18,16 @@
 <body>
   <main>
     <h1>Facturation</h1>
-    <p>L'application Facturation est maintenant gérée dans Apps Script, comme les autres outils Soleco.</p>
-    <p>Redirection vers le portail...</p>
-    <a href="/">Retourner à Soleco Apps</a>
+    <p>L'application Facturation est gérée dans Apps Script.</p>
+    <p>Redirection vers l'application...</p>
+    <a id="fallback" href="https://script.google.com/macros/s/AKfycbz0ZP5Qysvu7zNXRSF4CKgJFHGMisNeN-PVWFmAKHr51ruvaqthGgiW6vQ9-Bdq17tG/exec">Ouvrir Facturation</a>
   </main>
-  <script>setTimeout(function(){ location.replace('/'); }, 800);</script>
+  <script>
+    (function () {
+      var target = 'https://script.google.com/macros/s/AKfycbz0ZP5Qysvu7zNXRSF4CKgJFHGMisNeN-PVWFmAKHr51ruvaqthGgiW6vQ9-Bdq17tG/exec' + window.location.search + window.location.hash;
+      document.getElementById('fallback').href = target;
+      window.location.replace(target);
+    }());
+  </script>
 </body>
 </html>
