@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Facturation - Soleco Apps</title>
+  <meta name="description" content="Suivi des échéances, abonnements et factures clients Soleco.">
+  <meta name="theme-color" content="#161616">
+  <meta name="robots" content="noindex">
+  <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="../assets/icon-512.png">
+  <style>
+    :root {
+      --bg: #161616; --surface: #1e1e1e; --surface-2: #262626; --sunk: #151515;
+      --text: #ededed; --muted: #a8a8a8; --border: rgba(255,255,255,.10); --border-strong: rgba(255,255,255,.20);
+      --accent: #fcdc49; --accent-weak: rgba(252,220,73,.14); --accent-text: #181818;
+      --ok: #3d8bff; --todo: #2ec27e; --wait: #ff9f1c; --danger: #ff6b6b;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 18px 40px rgba(0,0,0,.35);
+      --radius: 8px; --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    }
+    :root[data-theme="light"] {
+      --bg: #f4f5f7; --surface: #ffffff; --surface-2: #eef0f3; --sunk: #f8f9fb;
+      --text: #1c1e21; --muted: #6b7280; --border: rgba(0,0,0,.10); --border-strong: rgba(0,0,0,.22);
+      --accent: #b8860b; --accent-weak: rgba(184,134,11,.12); --accent-text: #ffffff;
+      --shadow: 0 1px 2px rgba(0,0,0,.08), 0 14px 34px rgba(0,0,0,.10);
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body { font-family: var(--font); color: var(--text); background: var(--bg); }
+    button, input, select { font: inherit; color: inherit; }
+    button { border: 1px solid var(--border-strong); background: var(--surface-2); border-radius: var(--radius); padding: 8px 11px; cursor: pointer; }
+    button:hover { border-color: var(--accent); }
+    button.primary { background: var(--accent); color: var(--accent-text); border-color: var(--accent); font-weight: 800; }
+    button.ghost { background: transparent; }
+    button.icon { width: 36px; height: 36px; display: grid; place-items: center; padding: 0; }
+    input, select { width: 100%; background: var(--sunk); border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 10px; }
+    label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { border-bottom: 1px solid var(--border); padding: 9px 8px; text-align: left; vertical-align: top; }
+    th { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+    .topbar { position: sticky; top: 0; z-index: 10; height: 56px; display: flex; align-items: center; gap: 12px; padding: 0 16px; background: var(--surface); border-bottom: 1px solid var(--border); }
+    .logo { width: 30px; height: 30px; border-radius: 8px; object-fit: contain; }
+    .brand { display: grid; line-height: 1.15; min-width: 0; }
+    .brand b { font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .brand span { color: var(--muted); font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .spacer { flex: 1; }
+    .who { color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    main { max-width: 1280px; margin: 0 auto; padding: 22px; }
+    .head { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+    h1 { margin: 0; font-size: 23px; }
+    .sub { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+    .cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px; }
+    .metric { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: var(--radius); padding: 13px; box-shadow: var(--shadow); }
+    .metric .k { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; }
+    .metric .v { margin-top: 6px; font-size: 22px; font-weight: 800; }
+    .filters { display: grid; grid-template-columns: 130px 130px 170px 170px 1fr auto; gap: 10px; align-items: end; margin-bottom: 14px; }
+    .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+    .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border-bottom: 1px solid var(--border); }
+    .panel-head b { font-size: 14px; }
+    .tablewrap { overflow-x: auto; }
+    .pill { display: inline-flex; align-items: center; min-height: 22px; border-radius: 999px; padding: 2px 8px; border: 1px solid var(--border); background: var(--surface-2); font-size: 12px; }
+    .st-aemettre { color: var(--todo); } .st-enattente { color: var(--wait); } .st-facturee { color: var(--ok); } .st-annulee { color: var(--danger); } .st-acompleter { color: var(--wait); }
+    .err { color: var(--danger); min-height: 1em; font-size: 13px; }
+    .empty { padding: 28px 14px; color: var(--muted); text-align: center; }
+    .gate { max-width: 420px; margin: 9vh auto 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px; }
+    .gate h1 { font-size: 20px; }
+    .hidden { display: none !important; }
+    @media (max-width: 900px) { .cards { grid-template-columns: repeat(2, 1fr); } .filters { grid-template-columns: repeat(2, 1fr); } .head { align-items: start; flex-direction: column; } }
+    @media (max-width: 620px) { main { padding: 14px; } .cards, .filters { grid-template-columns: 1fr; } .who { display: none; } }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <img class="logo" src="../assets/icon-512.png" alt="">
+    <div class="brand"><b>Soleco Apps</b><span>Facturation clients</span></div>
+    <span class="spacer"></span>
+    <span id="status" class="who"></span>
+    <button class="icon" id="themeBtn" title="Thème clair / sombre" aria-label="Thème">◐</button>
+    <button class="ghost" id="logoutBtn">Quitter</button>
+  </header>
+
+  <main>
+    <section id="gate" class="gate hidden">
+      <h1>Connexion requise</h1>
+      <p class="sub">Ouvre la tuile depuis Soleco Apps pour accéder à la facturation.</p>
+      <p class="err" id="gateErr"></p>
+      <button class="primary" onclick="location.href='../'">Retour au portail</button>
+    </section>
+
+    <section id="app" class="hidden">
+      <div class="head">
+        <div><h1>Facturation</h1><p class="sub">Échéances issues des contrats Supabase, suivi enregistré par numéro d'affaire.</p></div>
+        <button class="primary" id="refreshBtn">Actualiser</button>
+      </div>
+
+      <div class="cards" id="cards"></div>
+
+      <div class="filters">
+        <label>Année<input id="yearInput" type="number" min="2020" max="2100"></label>
+        <label>Mois<select id="monthInput"><option value="">Année complète</option></select></label>
+        <label>Statut<select id="statusInput"><option value="">Tous</option><option>A compléter</option><option>A émettre</option><option>En attente</option><option>Facturée</option><option>Annulée</option></select></label>
+        <label>Type<select id="typeInput"><option value="">Tous</option><option>Maintenance</option><option>Monitoring</option><option>GSM</option></select></label>
+        <label>Recherche<input id="searchInput" placeholder="Client, affaire, exploitation..."></label>
+        <button id="resetBtn">Réinitialiser</button>
+      </div>
+
+      <section class="panel">
+        <div class="panel-head"><b>Échéances</b><span class="sub" id="countLabel"></span></div>
+        <div class="tablewrap"><table><thead><tr><th>Échéance</th><th>Client</th><th>Affaire</th><th>Entité</th><th>Type</th><th>Fréquence</th><th>Montant HT</th><th>Statut</th><th>Action</th></tr></thead><tbody id="rows"></tbody></table></div>
+        <div class="empty hidden" id="empty">Aucune échéance pour ces filtres.</div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+  (function () {
+    'use strict';
+    var SB = 'https://bsrijihrkhhhhfnngryl.supabase.co';
+    var KEY = 'sb_publishable_YZFYuqQsfYgC-pSxLU4qOg_L0TGr_XF';
+    var APP = 'FACTURATION';
+    var STORE = 'soleco-token';
+    var TOKEN = null, CTX = null, SOURCES = [], SUIVI = [], ENTRIES = [];
+    var months = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+    var $ = function (s, r) { return (r || document).querySelector(s); };
+    var esc = function (v) { return String(v == null ? '' : v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); };
+    var norm = function (v) { return String(v || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim(); };
+    var money = function (v) { return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(Number(v || 0)); };
+    function setStatus(m) { $('#status').textContent = m || ''; }
+    function rpc(fn, body) {
+      return fetch(SB + '/rest/v1/rpc/' + fn, {
+        method: 'POST', headers: { apikey: KEY, Authorization: 'Bearer ' + KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(body || {})
+      }).then(function (r) { return r.text().then(function (t) { if (r.ok) return t ? JSON.parse(t) : null; var m = t; try { var j = JSON.parse(t); m = j.message || j.hint || j.details || t; } catch (e) {} throw new Error(m || ('Erreur ' + r.status)); }); });
+    }
+    function theme() {
+      var root = document.documentElement, saved = localStorage.getItem('soleco-theme');
+      if (saved === 'light' || saved === 'dark') root.setAttribute('data-theme', saved);
+      $('#themeBtn').onclick = function () { var n = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light'; root.setAttribute('data-theme', n); localStorage.setItem('soleco-theme', n); };
+    }
+    function gate(msg) { $('#app').classList.add('hidden'); $('#gate').classList.remove('hidden'); $('#gateErr').textContent = msg || ''; }
+    function showApp() { $('#gate').classList.add('hidden'); $('#app').classList.remove('hidden'); }
+    function logout() { var t = TOKEN; TOKEN = null; localStorage.removeItem(STORE); if (t) rpc('deconnexion', { p_token: t }).catch(function () {}); gate('Session terminée.'); }
+    function auth() {
+      var h = new URLSearchParams(location.search).get('h');
+      TOKEN = localStorage.getItem(STORE);
+      if (h) {
+        history.replaceState(null, '', location.pathname);
+        setStatus('Connexion...');
+        return rpc('echanger_relais', { p_code: h, p_app: APP, p_ua: navigator.userAgent || '' }).then(function (s) {
+          TOKEN = s.token; CTX = s; localStorage.setItem(STORE, TOKEN); setStatus(CTX.login || 'Connecté'); showApp(); return load();
+        }).catch(function (e) { setStatus(''); gate(e.message); });
+      }
+      if (!TOKEN) { gate('Session absente.'); return Promise.resolve(); }
+      setStatus('Connexion...');
+      return rpc('session_valide', { p_token: TOKEN, p_app: APP }).then(function (s) { CTX = s; setStatus(CTX.login || 'Connecté'); showApp(); return load(); }).catch(function (e) { localStorage.removeItem(STORE); setStatus(''); gate(e.message); });
+    }
+    function freqLabel(v) { var n = norm(v); if (n.indexOf('mens') === 0) return 'Mensuelle'; if (n.indexOf('trimes') === 0) return 'Trimestrielle'; if (n.indexOf('semes') === 0) return 'Semestrielle'; if (n.indexOf('annu') === 0) return 'Annuelle'; return String(v || ''); }
+    function freqMonths(v) { return { Mensuelle: 1, Trimestrielle: 3, Semestrielle: 6, Annuelle: 12 }[freqLabel(v)] || 0; }
+    function startDate(s) { return s.demarrage_facturation || s.date_debut || null; }
+    function due(start, step, y, m) { var d = start ? new Date(start + 'T00:00:00') : null; if (!d || !step) return false; var diff = (y - d.getFullYear()) * 12 + (m - 1 - d.getMonth()); return diff >= 0 && diff % step === 0; }
+    function dueDate(start, y, m) { var d = start ? new Date(start + 'T00:00:00') : null, day = d ? d.getDate() : 1, last = new Date(y, m, 0).getDate(); return [y, String(m).padStart(2,'0'), String(Math.min(day,last)).padStart(2,'0')].join('-'); }
+    function amountPart(amount, f) { var d = { Mensuelle: 12, Trimestrielle: 4, Semestrielle: 2, Annuelle: 1 }[freqLabel(f)] || 1; return Math.round(Number(amount || 0) / d * 100) / 100; }
+    function invoiceKey(s, type, y, m) { return [s.numero_affaire, s.contrat_id || s.site_id || 'site', norm(type).replace(/\s+/g, '-'), y, String(m).padStart(2,'0')].join('__'); }
+    function suiviMap() { return SUIVI.reduce(function (a, r) { a[r.invoice_key] = r; return a; }, {}); }
+    function buildEntries() {
+      var y = Number($('#yearInput').value), selectedMonth = $('#monthInput').value, map = suiviMap(), out = [];
+      SOURCES.forEach(function (s) {
+        var f = freqLabel(s.periodicite), step = freqMonths(f), start = startDate(s), type = (s.type_preventif || s.type_curatif) ? 'Maintenance' : 'Monitoring';
+        var monthsToScan = selectedMonth ? [Number(selectedMonth)] : [1,2,3,4,5,6,7,8,9,10,11,12];
+        if (Number(s.montant_annuel_contrat_ht || 0) > 0 && step) monthsToScan.forEach(function (m) { if (due(start, step, y, m)) out.push(entry(s, type, f, 1, amountPart(s.montant_annuel_contrat_ht, f), y, m, map)); });
+        if (Number(s.montant_annuel_contrat_ht || 0) > 0 && !step) out.push(missing(s));
+        if (Number(s.nb_lignes_data_refacturables || 0) > 0 && Number(s.montant_annuel_gsm_ht || 0) > 0) monthsToScan.forEach(function (m) { if (due(start, 12, y, m)) out.push(entry(s, 'GSM', 'Annuelle', Number(s.nb_lignes_data_refacturables || 0), Number(s.montant_annuel_gsm_ht || 0), y, m, map)); });
+      });
+      ENTRIES = out.sort(function (a,b) { return String(a.date_echeance).localeCompare(String(b.date_echeance)) || String(a.client_nom).localeCompare(String(b.client_nom)); });
+    }
+    function entry(s, type, f, q, amount, y, m, map) {
+      var key = invoiceKey(s, type, y, m), rec = map[key] || {}, auto = !!s.abonnement;
+      return { invoice_key: key, numero_affaire: s.numero_affaire, site_id: s.site_id, contrat_id: s.contrat_id, tiers_id: s.tiers_id, client_nom: s.client_nom, site_nom: s.site_nom, tiers_nom: s.tiers_nom, agence: s.agence_code || s.agence_nom, exploitation: s.exploitation_code || s.exploitation_nom, type: type, frequence: f, periode: months[m - 1] + ' ' + y, annee: y, mois: m, date_echeance: dueDate(startDate(s), y, m), quantite: q, montant_ht: amount, statut: auto ? 'Facturée' : (rec.statut || 'A émettre'), date_facturation: rec.date_facturation || '', note: rec.note || '', abonnement: auto, bon_commande_requis: !!s.bon_commande_requis, indexation: !!s.indexation };
+    }
+    function missing(s) { return { rowType: 'missing', invoice_key: '', numero_affaire: s.numero_affaire, client_nom: s.client_nom, tiers_nom: s.tiers_nom, type: 'Maintenance', frequence: '', montant_ht: Number(s.montant_annuel_contrat_ht || 0), statut: 'A compléter' }; }
+    function filtered() { var st = $('#statusInput').value, ty = $('#typeInput').value, q = norm($('#searchInput').value); return ENTRIES.filter(function (e) { if (st && e.statut !== st) return false; if (ty && e.type !== ty) return false; if (q && norm([e.client_nom, e.tiers_nom, e.numero_affaire, e.exploitation, e.type].join(' ')).indexOf(q) < 0) return false; return true; }); }
+    function render() { buildEntries(); var rows = filtered(); renderCards(rows); $('#countLabel').textContent = rows.length + ' ligne(s)'; $('#empty').classList.toggle('hidden', rows.length > 0); $('#rows').innerHTML = rows.map(row).join(''); wireRows(rows); }
+    function renderCards(rows) { var total = rows.reduce(function (s,e) { return s + Number(e.montant_ht || 0); }, 0), todo = rows.filter(function(e){return e.statut === 'A émettre';}), wait = rows.filter(function(e){return e.statut === 'En attente';}), billed = rows.filter(function(e){return e.statut === 'Facturée';}); $('#cards').innerHTML = metric('À émettre', todo.length, sum(todo), '#2ec27e') + metric('En attente', wait.length, sum(wait), '#ff9f1c') + metric('Facturée', billed.length, sum(billed), '#3d8bff') + metric('Total filtre', rows.length, total, '#fcdc49'); }
+    function sum(a) { return a.reduce(function(s,e){return s + Number(e.montant_ht || 0);}, 0); }
+    function metric(k, n, v, c) { return '<div class="metric" style="border-left-color:' + c + '"><div class="k">' + esc(k) + '</div><div class="v">' + esc(money(v)) + '</div><p class="sub">' + n + ' ligne(s)</p></div>'; }
+    function statusClass(s) { return 'st-' + norm(s).replace(/[^a-z0-9]/g, ''); }
+    function row(e, i) { return '<tr data-i="' + i + '"><td>' + esc(e.date_echeance || '-') + '</td><td><b>' + esc(e.client_nom || '-') + '</b><div class="sub">' + esc(e.exploitation || '') + '</div></td><td>' + esc(e.numero_affaire || '-') + '</td><td>' + esc(e.tiers_nom || '-') + '</td><td><span class="pill">' + esc(e.type || '-') + '</span></td><td>' + esc(e.frequence || '-') + '</td><td><b>' + esc(money(e.montant_ht)) + '</b></td><td><span class="pill ' + statusClass(e.statut) + '">' + esc(e.statut) + '</span></td><td>' + (e.rowType === 'missing' || e.abonnement ? '<span class="sub">' + (e.abonnement ? 'Abonnement' : 'À compléter') + '</span>' : '<select data-status><option>A émettre</option><option>En attente</option><option>Facturée</option><option>Annulée</option></select>') + '</td></tr>'; }
+    function wireRows(rows) { document.querySelectorAll('[data-status]').forEach(function (sel) { var tr = sel.closest('tr'), e = rows[Number(tr.getAttribute('data-i'))]; sel.value = e.statut; sel.onchange = function () { saveStatus(e, sel.value); }; }); }
+    function saveStatus(e, st) { setStatus('Enregistrement...'); e.statut = st; if (st === 'Facturée' && !e.date_facturation) e.date_facturation = new Date().toISOString().slice(0,10); rpc('facture_suivi_maj', { p_token: TOKEN, p_invoice_key: e.invoice_key, p_donnees: e }).then(load).catch(function (err) { setStatus(''); alert(err.message); }); }
+    function load() { setStatus('Chargement...'); var y = Number($('#yearInput').value) || new Date().getFullYear(); return Promise.all([rpc('facturation_sources_lire', { p_token: TOKEN }), rpc('factures_suivi_lire', { p_token: TOKEN, p_annee: y, p_mois: $('#monthInput').value ? Number($('#monthInput').value) : null })]).then(function (r) { SOURCES = r[0] || []; SUIVI = r[1] || []; setStatus(CTX && CTX.login ? CTX.login : 'Connecté'); render(); }).catch(function (e) { setStatus(''); gate(e.message); }); }
+    function initInputs() { var now = new Date(); $('#yearInput').value = now.getFullYear(); $('#monthInput').innerHTML += months.map(function (m, i) { return '<option value="' + (i + 1) + '">' + m + '</option>'; }).join(''); ['yearInput','monthInput'].forEach(function (id) { $('#' + id).addEventListener('change', load); }); ['statusInput','typeInput','searchInput'].forEach(function (id) { $('#' + id).addEventListener('input', render); }); $('#resetBtn').onclick = function () { $('#statusInput').value = ''; $('#typeInput').value = ''; $('#searchInput').value = ''; render(); }; $('#refreshBtn').onclick = load; $('#logoutBtn').onclick = logout; }
+    theme(); initInputs(); auth();
+  })();
+  </script>
+</body>
+</html>
