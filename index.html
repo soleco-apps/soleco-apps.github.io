@@ -4,29 +4,24 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Soleco Apps</title>
-  <meta name="description" content="Accès rapide aux applications métiers Soleco.">
+  <meta name="description" content="Portail des applications métiers Soleco.">
   <meta name="theme-color" content="#161616">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Soleco Apps">
+  <meta name="robots" content="noindex">
   <link rel="manifest" href="site.webmanifest">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
   <link rel="icon" type="image/png" sizes="512x512" href="assets/icon-512.png">
   <style>
     :root {
-      --bg: #161616;
-      --surface: #1e1e1e;
-      --surface-2: #262626;
-      --text: #ededed;
-      --muted: #a8a8a8;
-      --border: rgba(255,255,255,.10);
-      --border-strong: rgba(255,255,255,.20);
-      --accent: #fcdc49;
-      --accent-weak: rgba(252,220,73,.14);
-      --accent-text: #181818;
-      --radius: 14px;
-      --radius-sm: 9px;
+      --bg: #161616; --surface: #1e1e1e; --surface-2: #262626; --surface-sunk: #151515;
+      --text: #ededed; --muted: #a8a8a8;
+      --border: rgba(255,255,255,.10); --border-strong: rgba(255,255,255,.20);
+      --accent: #fcdc49; --accent-weak: rgba(252,220,73,.14); --accent-text: #181818;
+      --ok: #6bbf59; --danger: #e5706b;
+      --radius: 14px; --radius-sm: 9px;
       --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
       --shadow: 0 1px 2px rgba(0,0,0,.4), 0 18px 40px rgba(0,0,0,.35);
     }
@@ -42,49 +37,80 @@
       padding: max(24px, env(safe-area-inset-top)) 20px 40px;
     }
     .shell { width: min(100%, 900px); }
-    .hero {
-      display: flex; align-items: center; gap: 16px;
-      padding: 18px 4px 22px;
-    }
+    .hero { display: flex; align-items: center; gap: 16px; padding: 18px 4px 22px; }
     .hero img { width: 68px; height: 68px; border-radius: 16px; flex: 0 0 68px; object-fit: contain;
       background: var(--surface); border: 1px solid var(--border); padding: 8px; }
     .hero h1 { margin: 0; font-size: 26px; letter-spacing: -.02em; }
     .hero p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
-    .grid {
-      display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px;
+    .hero .spacer { flex: 1; }
+    .who { text-align: right; font-size: 13px; color: var(--muted); }
+    .who b { color: var(--text); display: block; }
+    .who button { margin-top: 6px; }
+
+    button, .btn {
+      font: inherit; cursor: pointer; border-radius: var(--radius-sm);
+      border: 1px solid var(--border-strong); background: var(--surface-2); color: inherit;
+      padding: 7px 12px;
     }
+    button.primary { background: var(--accent); color: var(--accent-text); border-color: var(--accent); font-weight: 700; }
+    button.small { padding: 4px 9px; font-size: 12px; }
+    button[disabled] { opacity: .5; cursor: default; }
+    input, select {
+      font: inherit; width: 100%; padding: 8px 10px; border-radius: 8px; color: inherit;
+      border: 1px solid var(--border); background: var(--surface-sunk);
+    }
+    label.f { display: block; font-size: 12px; color: var(--muted); margin: 10px 0 4px; }
+    .err { color: var(--danger); font-size: 13px; margin-top: 10px; min-height: 1em; }
+    .lnk { color: var(--accent); cursor: pointer; font-size: 13px; }
+
+    .card { max-width: 420px; margin: 6vh auto 0; padding: 24px;
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+    .card h2 { margin: 0 0 4px; }
+    .card .sub { color: var(--muted); font-size: 13px; margin: 0 0 14px; }
+    .row { display: flex; align-items: center; gap: 8px; }
+    .jg { display: flex; gap: 4px; margin-top: 6px; }
+    .jg i { flex: 1; height: 6px; border-radius: 999px; background: var(--border); }
+    .jg i.on { background: #e0a83b; } .jg i.on.s3 { background: #6bbf59; } .jg i.on.s4 { background: #3a9d3a; }
+
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
     .tile {
       display: grid; grid-template-rows: auto auto 1fr auto; gap: 8px;
-      min-height: 168px; padding: 18px;
-      text-decoration: none; color: inherit;
-      background: var(--surface);
-      border: 1px solid var(--border); border-left: 3px solid var(--accent);
+      min-height: 150px; padding: 18px; width: 100%; text-align: left;
+      background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent);
       border-radius: var(--radius); box-shadow: var(--shadow);
-      transition: transform .15s ease, border-color .15s ease;
+      transition: transform .15s ease, border-color .15s ease; color: inherit;
     }
-    .tile:hover, .tile:focus-visible {
-      transform: translateY(-2px); border-color: var(--accent); outline: none;
-    }
-    .tile .kicker { font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
-      color: var(--accent); font-weight: 800; }
-    .tile h2 { margin: 0; font-size: 20px; line-height: 1.1; }
-    .tile p { margin: 0; color: var(--muted); font-size: 13px; max-width: 32ch; }
-    .tile .go { display: flex; align-items: center; justify-content: space-between;
-      gap: 10px; font-size: 13px; font-weight: 700; color: #f9e595; }
-    .tile .go .arrow {
-      width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center;
-      background: var(--accent-weak); border: 1px solid var(--border-strong); font-size: 17px;
-    }
-    .tips {
-      margin-top: 18px; padding: 14px 16px;
-      background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm);
-      color: var(--muted); font-size: 13px; line-height: 1.5;
-    }
-    .tips strong { color: var(--text); }
-    @media (max-width: 640px) {
-      .grid { grid-template-columns: 1fr; }
-      .hero h1 { font-size: 22px; }
-    }
+    .tile:hover, .tile:focus-visible { transform: translateY(-2px); border-color: var(--accent); outline: none; }
+    .tile .kicker { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); font-weight: 800; }
+    .tile h3 { margin: 0; font-size: 19px; line-height: 1.1; }
+    .tile p { margin: 0; color: var(--muted); font-size: 13px; }
+    .tile .go { display: flex; align-items: center; justify-content: space-between; font-size: 13px; font-weight: 700; color: #f9e595; }
+    .tile .arrow { width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center;
+      background: var(--accent-weak); border: 1px solid var(--border-strong); font-size: 16px; }
+    a.tile { text-decoration: none; }
+
+    h2.sec { margin: 30px 0 12px; font-size: 15px; color: var(--muted); font-weight: 700;
+      text-transform: uppercase; letter-spacing: .08em; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; }
+    .tag { display: inline-block; padding: 1px 7px; border-radius: 999px; font-size: 11px;
+      background: var(--surface-2); border: 1px solid var(--border); }
+    .tag.warn { color: var(--danger); border-color: var(--danger); }
+    .tag.ok { color: var(--ok); }
+    .tablewrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius-sm); }
+    .hidden { display: none !important; }
+
+    dialog { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface);
+      color: var(--text); max-width: 460px; width: 92vw; padding: 20px; box-shadow: var(--shadow); }
+    dialog::backdrop { background: rgba(0,0,0,.6); }
+
+    #status { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%);
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px;
+      padding: 6px 14px; font-size: 12px; color: var(--muted); opacity: 0; transition: opacity .2s; }
+    #status.on { opacity: 1; }
+
+    @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } .hero h1 { font-size: 22px; } }
   </style>
 </head>
 <body>
@@ -93,46 +119,492 @@
       <img src="assets/icon-512.png" alt="Soleco">
       <div>
         <h1>Soleco Apps</h1>
-        <p>Point d'entrée des applications métiers de l'entreprise.</p>
+        <p>Point d'entrée des applications métiers.</p>
       </div>
+      <div class="spacer"></div>
+      <div class="who hidden" id="who"></div>
     </header>
 
-    <section class="grid" aria-label="Applications">
-      <a class="tile" href="https://script.google.com/macros/s/AKfycbyGdOfUXsMGt3lZPxWCXrmctV77v1wobB08-9IVh-0dceQNHUyhccIXfs6D7CG7bPT2/exec" target="_blank" rel="noopener">
-        <div class="kicker">Référentiel</div>
-        <h2>Base de Données</h2>
-        <p>Sites, tiers, contrats, contacts, postes EDF, codes.</p>
-        <div class="go"><span>Ouvrir</span><span class="arrow">↗</span></div>
-      </a>
+    <div id="gate"></div>
 
-      <a class="tile" href="https://script.google.com/macros/s/AKfycbwcfaNmr6KUhHJAm13IcmQlcPlCIjDRYvo7z2nurJRFaP415wC4AeIqghwCYxR2pWrW/exec" target="_blank" rel="noopener">
-        <div class="kicker">EDF</div>
-        <h2>Messages Collationnés</h2>
-        <p>Saisie, clôture et historique des messages collationnés EDF.</p>
-        <div class="go"><span>Ouvrir</span><span class="arrow">↗</span></div>
-      </a>
+    <div id="app" class="hidden">
+      <section class="grid" id="tiles" aria-label="Applications"></section>
 
-      <a class="tile" href="https://script.google.com/macros/s/AKfycbxx1Qr9DVQufFyBXRiYYNUz1maP7lJhYNk8SjW-lx_BwFGyDrREWW2T7vg3VeSCP2MELg/exec" target="_blank" rel="noopener">
-        <div class="kicker">Exploitation</div>
-        <h2>GMAO Monitoring</h2>
-        <p>Tickets, pannes, indemnisations, aide au dépannage.</p>
-        <div class="go"><span>Ouvrir</span><span class="arrow">↗</span></div>
-      </a>
+      <h2 class="sec">Autres outils</h2>
+      <section class="grid">
+        <a class="tile" href="https://script.google.com/macros/s/AKfycbxx1Qr9DVQufFyBXRiYYNUz1maP7lJhYNk8SjW-lx_BwFGyDrREWW2T7vg3VeSCP2MELg/exec" target="_blank" rel="noopener">
+          <div class="kicker">Exploitation</div><h3>GMAO Monitoring</h3>
+          <p>Tickets, pannes, indemnisations, aide au dépannage.</p>
+          <div class="go"><span>Ouvrir</span><span class="arrow">↗</span></div>
+        </a>
+        <a class="tile" href="https://script.google.com/macros/s/AKfycbySL_Cc1L9sF6DIC4ZzatjavtruaSea20bUyp9X7Ji80N-BqKXO9WIATDRUoq13wIGF/exec" target="_blank" rel="noopener">
+          <div class="kicker">Suivi</div><h3>Overview</h3>
+          <p>Vue d'ensemble et suivi Soleco.</p>
+          <div class="go"><span>Ouvrir</span><span class="arrow">↗</span></div>
+        </a>
+      </section>
 
-      <a class="tile" href="https://script.google.com/macros/s/AKfycbySL_Cc1L9sF6DIC4ZzatjavtruaSea20bUyp9X7Ji80N-BqKXO9WIATDRUoq13wIGF/exec" target="_blank" rel="noopener">
-        <div class="kicker">Suivi</div>
-        <h2>Overview</h2>
-        <p>Vue d'ensemble et suivi Soleco.</p>
-        <div class="go"><span>Ouvrir</span><span class="arrow">↗</span></div>
-      </a>
-    </section>
-
-    <p class="tips">
-      <strong>Ajouter à l'écran d'accueil (iPhone)</strong> : ouvrir cette page dans
-      Safari, bouton Partager, « Sur l'écran d'accueil ». L'icône et le nom Soleco
-      sont repris automatiquement. Sur Firefox / Chrome ordinateur : ⭐ favori ou
-      épingler l'onglet.
-    </p>
+      <div id="admin" class="hidden">
+        <h2 class="sec">Administration — comptes</h2>
+        <div id="adminComptes"></div>
+        <h2 class="sec">Administration — applications</h2>
+        <div id="adminApps"></div>
+      </div>
+    </div>
   </main>
+
+  <div id="status"></div>
+  <dialog id="dlg"></dialog>
+
+  <script>
+  (function () {
+    'use strict';
+    var SB = 'https://bsrijihrkhhhhfnngryl.supabase.co';
+    var KEY = 'sb_publishable_YZFYuqQsfYgC-pSxLU4qOg_L0TGr_XF';
+    var APP = 'PORTAIL';
+    var STORE = 'soleco-token';
+    var TOKEN = null, CTX = null, UA = '';
+    try { UA = navigator.userAgent; } catch (e) {}
+    try { TOKEN = localStorage.getItem(STORE); } catch (e) {}
+
+    var $ = function (s, r) { return (r || document).querySelector(s); };
+    var esc = function (v) {
+      return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    };
+    var statusEl = $('#status');
+    function setStatus(m) { statusEl.textContent = m || ''; statusEl.classList.toggle('on', !!m); }
+
+    function rpc(fn, body) {
+      return fetch(SB + '/rest/v1/rpc/' + fn, {
+        method: 'POST',
+        headers: { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body || {})
+      }).then(function (r) {
+        return r.text().then(function (t) {
+          if (r.ok) return t ? JSON.parse(t) : null;
+          var m = t; try { var j = JSON.parse(t); m = j.message || j.hint || j.details || t; } catch (e) {}
+          throw new Error(m || ('Erreur ' + r.status));
+        });
+      });
+    }
+
+    /* ---------- robustesse mot de passe (miroir de valider_mdp_) ---------- */
+    function jauge(v, login, nom) {
+      v = v || ''; var f = 0;
+      if (/[a-z]/.test(v)) f++; if (/[A-Z]/.test(v)) f++;
+      if (/[0-9]/.test(v)) f++; if (/[^a-zA-Z0-9]/.test(v)) f++;
+      var loc = String(login || '').split('@')[0].toLowerCase(), pb = [];
+      if (v.length < 10) pb.push('10 caractères minimum');
+      if (f < 3) pb.push('mélanger 3 types (minuscule / majuscule / chiffre / symbole)');
+      if (loc.length >= 3 && v.toLowerCase().indexOf(loc) >= 0) pb.push('sans ton identifiant');
+      if (nom && nom.length >= 3 && v.toLowerCase().indexOf(String(nom).toLowerCase()) >= 0) pb.push('sans ton nom');
+      var s = Math.min(4, (v.length >= 10 ? 1 : 0) + (v.length >= 14 ? 1 : 0) + Math.max(0, f - 1));
+      return { ok: !pb.length, score: pb.length ? Math.min(s, 2) : Math.max(s, 3), pb: pb };
+    }
+    function mdpFields(id) {
+      return '<label class="f">Nouveau mot de passe</label><input type="password" id="' + id + 'a">' +
+        '<div class="jg" id="' + id + 'j"><i></i><i></i><i></i><i></i></div>' +
+        '<p class="sub" id="' + id + 'h" style="margin:4px 0 0"></p>' +
+        '<label class="f">Confirmer</label><input type="password" id="' + id + 'b">';
+    }
+    function mdpWire(root, id, login, nom, onok) {
+      var a = $('#' + id + 'a', root), b = $('#' + id + 'b', root),
+          j = $('#' + id + 'j', root), h = $('#' + id + 'h', root);
+      function maj() {
+        var r = jauge(a.value, login, nom);
+        [].forEach.call(j.children, function (el, i) { el.className = i < r.score ? ('on s' + r.score) : ''; });
+        h.textContent = r.pb.length ? ('Il manque : ' + r.pb.join(' · '))
+          : (b.value && b.value !== a.value ? 'La confirmation ne correspond pas.' : 'Mot de passe valide.');
+        if (onok) onok(r.ok && a.value === b.value);
+      }
+      a.addEventListener('input', maj); b.addEventListener('input', maj); maj();
+      return { val: function () { return a.value; }, ok: function () { return jauge(a.value, login, nom).ok && a.value === b.value; } };
+    }
+
+    /* ---------- écrans d'authentification ---------- */
+    var gate = $('#gate');
+    function gateErr(m) { var e = $('.err', gate); if (e) e.textContent = m || ''; }
+
+    function finalise(s) {
+      TOKEN = s.token;
+      try { localStorage.setItem(STORE, TOKEN); } catch (e) {}
+      if (s.doit_changer_mdp) { screenChanger(true); return; }
+      boot();
+    }
+    function logout() {
+      var t = TOKEN; TOKEN = null; CTX = null;
+      try { localStorage.removeItem(STORE); } catch (e) {}
+      if (t) rpc('deconnexion', { p_token: t }).catch(function () {});
+      $('#app').classList.add('hidden'); $('#who').classList.add('hidden');
+      screenConnexion('Session terminée.');
+    }
+
+    function screenConnexion(hint, prefill) {
+      $('#app').classList.add('hidden'); $('#who').classList.add('hidden');
+      gate.classList.remove('hidden');
+      gate.innerHTML =
+        '<div class="card"><h2>Connexion</h2><p class="sub">' + esc(hint || 'Accède à tes outils Soleco.') + '</p>' +
+        '<label class="f">Identifiant</label><input id="lu" value="' + esc(prefill || '') + '" placeholder="prenom.nom@soleco.fr">' +
+        '<label class="f">Mot de passe</label><input type="password" id="lp">' +
+        '<div class="row" style="margin:12px 0;font-size:13px"><input type="checkbox" id="ll" style="width:auto"> Rester connecté (30 jours)</div>' +
+        '<button class="primary" id="lg" style="width:100%">Se connecter</button>' +
+        '<div class="err"></div>' +
+        '<p style="text-align:center;margin-top:10px"><span class="lnk" id="ld">Demander un accès</span></p></div>';
+      var u = $('#lu', gate), p = $('#lp', gate);
+      function go() {
+        var l = u.value.trim(), m = p.value, lg = $('#ll', gate).checked;
+        if (!l || !m) { gateErr('Identifiant et mot de passe requis.'); return; }
+        gateErr(''); setStatus('Connexion…');
+        rpc('connexion', { p_login: l, p_mdp: m, p_app: APP, p_longue: lg, p_ua: UA }).then(function (s) {
+          setStatus('');
+          if (s && s.mdp_a_definir) { screenDefinir(s.login, s.nom, lg); return; }
+          finalise(s);
+        }).catch(function (e) { setStatus(''); gateErr(e.message); });
+      }
+      $('#lg', gate).addEventListener('click', go);
+      p.addEventListener('keydown', function (e) { if (e.key === 'Enter') go(); });
+      $('#ld', gate).addEventListener('click', function () { screenDemande(u.value.trim()); });
+      setTimeout(function () { (prefill ? p : u).focus(); }, 40);
+    }
+
+    function screenDefinir(login, nom, longue) {
+      gate.classList.remove('hidden');
+      gate.innerHTML =
+        '<div class="card"><h2>Créez votre mot de passe</h2>' +
+        '<p class="sub">Compte <b>' + esc(login) + '</b> — première connexion.</p>' +
+        mdpFields('d') +
+        '<div class="row" style="margin:12px 0;font-size:13px"><input type="checkbox" id="dl" style="width:auto"' + (longue ? ' checked' : '') + '> Rester connecté (30 jours)</div>' +
+        '<button class="primary" id="dok" style="width:100%" disabled>Valider et se connecter</button>' +
+        '<div class="err"></div></div>';
+      var ok = $('#dok', gate);
+      var c = mdpWire(gate, 'd', login, nom, function (v) { ok.disabled = !v; });
+      ok.addEventListener('click', function () {
+        if (!c.ok()) return; ok.disabled = true; setStatus('Création…'); gateErr('');
+        rpc('definir_mdp_initial', { p_login: login, p_mdp: c.val(), p_app: APP, p_longue: $('#dl', gate).checked, p_ua: UA })
+          .then(finalise).catch(function (e) { setStatus(''); ok.disabled = false; gateErr(e.message); });
+      });
+    }
+
+    function screenChanger(oblig) {
+      gate.classList.remove('hidden');
+      var login = (CTX && CTX.login) || '', nom = (CTX && CTX.nom) || '';
+      gate.innerHTML =
+        '<div class="card"><h2>' + (oblig ? 'Changement requis' : 'Changer mon mot de passe') + '</h2>' +
+        (oblig ? '<p class="sub">Un administrateur a demandé le renouvellement.</p>' : '') +
+        '<label class="f">Mot de passe actuel</label><input type="password" id="cc">' +
+        mdpFields('c') +
+        '<button class="primary" id="cok" style="width:100%;margin-top:6px" disabled>Valider</button>' +
+        (oblig ? '' : '<button id="cx" style="width:100%;margin-top:8px">Annuler</button>') +
+        '<div class="err"></div></div>';
+      var ok = $('#cok', gate);
+      var c = mdpWire(gate, 'c', login, nom, function (v) { ok.disabled = !(v && $('#cc', gate).value); });
+      $('#cc', gate).addEventListener('input', function () { ok.disabled = !(c.ok() && this.value); });
+      ok.addEventListener('click', function () {
+        ok.disabled = true; setStatus('Enregistrement…'); gateErr('');
+        rpc('changer_mdp', { p_token: TOKEN, p_ancien: $('#cc', gate).value, p_nouveau: c.val() }).then(function () {
+          setStatus(''); boot();
+        }).catch(function (e) { setStatus(''); ok.disabled = false; gateErr(e.message); });
+      });
+      var x = $('#cx', gate); if (x) x.addEventListener('click', boot);
+    }
+
+    function screenDemande(prefill) {
+      gate.classList.remove('hidden');
+      gate.innerHTML =
+        '<div class="card"><h2>Demander un accès</h2>' +
+        '<p class="sub">Transmis à un administrateur pour validation. Adresses @soleco.fr ou déjà connues.</p>' +
+        '<label class="f">Adresse e-mail</label><input id="qu" value="' + esc(prefill || '') + '">' +
+        '<label class="f">Nom et prénom</label><input id="qn">' +
+        '<button class="primary" id="qok" style="width:100%">Envoyer la demande</button>' +
+        '<button id="qb" style="width:100%;margin-top:8px">Retour</button>' +
+        '<div class="err"></div></div>';
+      $('#qb', gate).addEventListener('click', function () { screenConnexion(); });
+      $('#qok', gate).addEventListener('click', function () {
+        var l = $('#qu', gate).value.trim();
+        if (!l) { gateErr('Adresse requise.'); return; }
+        gateErr(''); setStatus('Envoi…');
+        rpc('demande_acces', { p_login: l, p_nom: $('#qn', gate).value.trim(), p_ua: UA }).then(function (r) {
+          setStatus('');
+          screenConnexion(r.etat === 'cree' ? 'Demande enregistrée. Un administrateur doit valider ton compte.'
+            : r.etat === 'en_attente' ? 'Une demande est déjà en attente.'
+            : 'Ce compte existe déjà — connecte-toi.');
+        }).catch(function (e) { setStatus(''); gateErr(e.message); });
+      });
+    }
+
+    function screenBlocage(msg) {
+      gate.classList.remove('hidden');
+      gate.innerHTML = '<div class="card"><h2>Accès refusé</h2><p class="sub">' +
+        esc(msg || 'Ton compte n\'a pas accès au portail.') + '</p>' +
+        '<button class="primary" id="bo" style="width:100%">Se déconnecter</button></div>';
+      $('#bo', gate).addEventListener('click', logout);
+    }
+
+    /* ---------- portail connecté ---------- */
+    function boot() {
+      if (!TOKEN) { screenConnexion(); return; }
+      setStatus('Chargement…');
+      rpc('session_valide', { p_token: TOKEN, p_app: APP }).then(function (s) {
+        if (s.doit_changer_mdp) { CTX = s; screenChanger(true); return Promise.reject({ handled: true }); }
+        CTX = s;
+        return rpc('mes_applications', { p_token: TOKEN });
+      }).then(function (apps) {
+        setStatus('');
+        gate.classList.add('hidden'); gate.innerHTML = '';
+        renderWho(); renderTiles(apps || []);
+        if (CTX.role === 'admin') { $('#admin').classList.remove('hidden'); renderAdmin(); }
+        else { $('#admin').classList.add('hidden'); }
+        $('#app').classList.remove('hidden');
+      }).catch(function (e) {
+        setStatus('');
+        if (e && e.handled) return;
+        var m = (e && e.message) || '';
+        if (/pas acc[eè]s|acc[eè]s à cet/i.test(m)) { screenBlocage(m); }
+        else if (/session/i.test(m)) { logout(); }
+        else { screenConnexion(m); }
+      });
+    }
+
+    function renderWho() {
+      var w = $('#who');
+      w.classList.remove('hidden');
+      w.innerHTML = '<b>' + esc(CTX.nom || CTX.login) + '</b>' +
+        esc(CTX.role) + ' · niveau ' + (CTX.niveau || 1) +
+        '<div><button class="small" id="w-mdp">Mot de passe</button> ' +
+        '<button class="small" id="w-out">Déconnexion</button></div>';
+      $('#w-mdp', w).addEventListener('click', function () { screenChanger(false); });
+      $('#w-out', w).addEventListener('click', logout);
+    }
+
+    var DESC = {
+      BDD: 'Sites, tiers, contrats, contacts, postes EDF, codes.',
+      MSG_EDF: 'Saisie, clôture et historique des messages collationnés EDF.'
+    };
+    var KICK = { BDD: 'Référentiel', MSG_EDF: 'EDF' };
+    function renderTiles(apps) {
+      var list = apps.filter(function (a) { return a.code !== APP && a.url; });
+      var g = $('#tiles');
+      if (!list.length) { g.innerHTML = '<p class="sub">Aucune application ne t\'est attribuée pour le moment.</p>'; return; }
+      g.innerHTML = list.map(function (a) {
+        return '<button class="tile" data-code="' + esc(a.code) + '">' +
+          '<div class="kicker">' + esc(KICK[a.code] || 'Outil') + '</div>' +
+          '<h3>' + esc(a.libelle) + '</h3>' +
+          '<p>' + esc(DESC[a.code] || '') + '</p>' +
+          '<div class="go"><span>Ouvrir</span><span class="arrow">↗</span></div></button>';
+      }).join('');
+      [].forEach.call(g.querySelectorAll('[data-code]'), function (b) {
+        b.addEventListener('click', function () {
+          var code = b.getAttribute('data-code');
+          var app = list.filter(function (x) { return x.code === code; })[0];
+          setStatus('Ouverture…'); b.disabled = true;
+          rpc('jeton_relais', { p_token: TOKEN, p_app_cible: code }).then(function (r) {
+            setStatus(''); b.disabled = false;
+            var u = app.url + (app.url.indexOf('?') < 0 ? '?' : '&') + 'h=' + encodeURIComponent(r.code);
+            window.open(u, '_blank', 'noopener');
+          }).catch(function (e) {
+            setStatus(''); b.disabled = false;
+            if (/pas acc[eè]s/i.test(e.message)) { alert(e.message); }
+            else { window.open(app.url, '_blank', 'noopener'); }
+          });
+        });
+      });
+    }
+
+    /* ---------- administration ---------- */
+    var APPS_ = [];
+    function renderAdmin() {
+      Promise.all([
+        rpc('admin_utilisateurs', { p_token: TOKEN }),
+        rpc('admin_applications', { p_token: TOKEN })
+      ]).then(function (res) {
+        var users = res[0] || []; APPS_ = res[1] || [];
+        renderComptes(users); renderApps();
+      }).catch(function (e) { $('#adminComptes').innerHTML = '<p class="err">' + esc(e.message) + '</p>'; });
+    }
+
+    function appAccess(u, app) {
+      var o = (u.applications || {})[app.code];
+      return (o === undefined) ? app.ouvert_par_defaut : o;
+    }
+    function renderComptes(users) {
+      var attente = users.filter(function (u) { return !u.valide; });
+      var actifs = users.filter(function (u) { return u.valide; });
+      function ligne(u) {
+        var badge = !u.valide ? '<span class="tag warn">à valider</span>'
+          : u.bloque ? '<span class="tag warn">bloqué</span>'
+          : !u.actif ? '<span class="tag">désactivé</span>' : '<span class="tag ok">actif</span>';
+        var apps = APPS_.filter(function (a) { return appAccess(u, a); }).map(function (a) { return a.code; }).join(', ');
+        return '<tr data-u="' + esc(u.login) + '"><td>' + esc(u.login) + '</td>' +
+          '<td>' + esc(u.contact_nom || u.nom || '') + '</td>' +
+          '<td>' + esc(u.role) + ' N' + (u.niveau || 1) + '</td>' +
+          '<td>' + badge + '</td><td>' + esc(apps || (u.role === 'admin' ? 'toutes' : '—')) + '</td>' +
+          '<td>' + esc(String(u.derniere_connexion_le || '').slice(0, 16).replace('T', ' ')) + '</td>' +
+          '<td><button class="small" data-edit>Modifier</button></td></tr>';
+      }
+      function tbl(l) {
+        return '<div class="tablewrap"><table><thead><tr><th>Identifiant</th><th>Contact</th><th>Rôle</th>' +
+          '<th>État</th><th>Applications</th><th>Dernière connexion</th><th></th></tr></thead><tbody>' +
+          l.map(ligne).join('') + '</tbody></table></div>';
+      }
+      var host = $('#adminComptes');
+      host.innerHTML =
+        (attente.length ? '<p class="err" style="margin:0 0 6px">' + attente.length + ' compte(s) en attente de validation</p>' + tbl(attente) + '<div style="height:12px"></div>' : '') +
+        '<div class="row" style="margin-bottom:8px;justify-content:flex-end;gap:8px">' +
+        '<button class="small" id="c-tech">Créer les comptes techniciens Soleco…</button>' +
+        '<button class="small primary" id="c-new">+ Nouveau compte</button></div>' +
+        tbl(actifs);
+      $('#c-new', host).addEventListener('click', function () { editCompte(null); });
+      $('#c-tech', host).addEventListener('click', modalTech);
+      [].forEach.call(host.querySelectorAll('[data-u] [data-edit]'), function (b) {
+        b.addEventListener('click', function () {
+          var login = b.closest('[data-u]').getAttribute('data-u');
+          editCompte(users.filter(function (x) { return x.login === login; })[0]);
+        });
+      });
+    }
+
+    function dlg(html) {
+      var d = $('#dlg'); d.innerHTML = html; d.showModal();
+      d.querySelectorAll('[data-x]').forEach(function (b) { b.addEventListener('click', function () { d.close(); }); });
+      return d;
+    }
+
+    function editCompte(u) {
+      var creation = !u;
+      u = u || { login: '', nom: '', role: 'lecteur', niveau: 1, actif: true, valide: true, applications: {} };
+      var appli = u.applications || {};
+      var d = dlg(
+        '<h2 style="margin-top:0">' + (creation ? 'Nouveau compte' : esc(u.login)) + '</h2>' +
+        '<label class="f">Identifiant (e-mail)</label><input id="e-login" value="' + esc(u.login) + '"' + (creation ? '' : ' readonly') + '>' +
+        '<label class="f">Nom</label><input id="e-nom" value="' + esc(u.nom || '') + '">' +
+        '<div class="row" style="gap:10px"><div style="flex:1"><label class="f">Rôle</label>' +
+        '<select id="e-role">' + ['lecteur', 'editeur', 'admin'].map(function (r) {
+          return '<option' + (u.role === r ? ' selected' : '') + '>' + r + '</option>';
+        }).join('') + '</select></div>' +
+        '<div style="flex:1"><label class="f">Niveau</label><select id="e-niv">' +
+        [1, 2, 3, 4].map(function (n) { return '<option' + (u.niveau === n ? ' selected' : '') + '>' + n + '</option>'; }).join('') +
+        '</select></div></div>' +
+        '<div class="row" style="margin-top:12px;font-size:13px"><input type="checkbox" id="e-val" style="width:auto"' + (u.valide ? ' checked' : '') + '> <b>Compte validé</b> (sinon connexion impossible)</div>' +
+        '<div class="row" style="margin-top:6px;font-size:13px"><input type="checkbox" id="e-act" style="width:auto"' + (u.actif ? ' checked' : '') + '> Actif</div>' +
+        '<label class="f">Applications autorisées</label><div style="display:flex;flex-wrap:wrap;gap:10px">' +
+        APPS_.map(function (a) {
+          return '<label style="font-size:13px"><input type="checkbox" data-app="' + esc(a.code) + '" style="width:auto"' +
+            (appAccess(u, a) ? ' checked' : '') + '> ' + esc(a.code) + '</label>';
+        }).join('') + '</div>' +
+        (creation ? '' :
+          '<div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">' +
+          '<button class="small" data-act="reset_mdp">Réinit. mot de passe</button>' +
+          (u.bloque ? '<button class="small" data-act="debloquer">Débloquer</button>' : '') +
+          '<button class="small" data-act="forcer_changement">Forcer changement</button>' +
+          (u.sessions ? '<button class="small" data-deco>Déconnecter (' + u.sessions + ')</button>' : '') +
+          (!u.valide && !u.mdp_defini ? '<button class="small" data-refuse>Refuser</button>' : '') +
+          '</div>') +
+        '<div class="err" id="e-err"></div>' +
+        '<div style="margin-top:14px;text-align:right"><button data-x>Annuler</button> ' +
+        '<button class="primary" id="e-ok">Enregistrer</button></div>');
+
+      function err(e) { $('#e-err', d).textContent = (e && e.message) || e; }
+      $('#e-ok', d).addEventListener('click', function () {
+        var login = $('#e-login', d).value.trim();
+        if (!login) { err('Identifiant requis.'); return; }
+        var apps = {};
+        d.querySelectorAll('[data-app]').forEach(function (c) { apps[c.getAttribute('data-app')] = c.checked; });
+        setStatus('Enregistrement…');
+        rpc('admin_maj_utilisateur', { p_token: TOKEN, p_login: login, p_donnees: {
+          nom: $('#e-nom', d).value || null, role: $('#e-role', d).value,
+          niveau: Number($('#e-niv', d).value), actif: $('#e-act', d).checked,
+          valide: $('#e-val', d).checked, applications: apps
+        } }).then(function () { setStatus(''); d.close(); renderAdmin(); }).catch(function (e) { setStatus(''); err(e); });
+      });
+      d.querySelectorAll('[data-act]').forEach(function (b) {
+        b.addEventListener('click', function () {
+          var k = b.getAttribute('data-act'); var o = {}; o[k] = true;
+          rpc('admin_maj_utilisateur', { p_token: TOKEN, p_login: u.login, p_donnees: o })
+            .then(function () { d.close(); renderAdmin(); }).catch(err);
+        });
+      });
+      var dc = d.querySelector('[data-deco]');
+      if (dc) dc.addEventListener('click', function () {
+        rpc('admin_deconnecter', { p_token: TOKEN, p_login: u.login }).then(function () { d.close(); renderAdmin(); }).catch(err);
+      });
+      var rf = d.querySelector('[data-refuse]');
+      if (rf) rf.addEventListener('click', function () {
+        if (!confirm('Refuser et supprimer la demande de ' + u.login + ' ?')) return;
+        rpc('admin_refuser_demande', { p_token: TOKEN, p_login: u.login }).then(function () { d.close(); renderAdmin(); }).catch(err);
+      });
+    }
+
+    function modalTech() {
+      var d = dlg('<h2 style="margin-top:0">Comptes techniciens Soleco</h2>' +
+        '<p class="sub">Crée un compte (non validé, lecteur N2) pour chaque contact technicien rattaché à SOLECO sans compte.</p>' +
+        '<div id="t-res" class="sub">Analyse…</div>' +
+        '<div style="margin-top:12px;text-align:right"><button data-x>Fermer</button> ' +
+        '<button class="primary" id="t-go" disabled>Créer</button></div>');
+      var go = $('#t-go', d);
+      function show(r) {
+        $('#t-res', d).innerHTML = '<b>' + r.a_creer + '</b> à créer · ' + r.deja_en_place + ' déjà en place · ' + r.sans_email + ' sans e-mail';
+        go.disabled = !r.a_creer;
+      }
+      rpc('admin_creer_comptes_techniciens', { p_token: TOKEN, p_dry_run: true }).then(show)
+        .catch(function (e) { $('#t-res', d).textContent = e.message; });
+      go.addEventListener('click', function () {
+        go.disabled = true;
+        rpc('admin_creer_comptes_techniciens', { p_token: TOKEN, p_dry_run: false }).then(function (r) {
+          d.close(); renderAdmin();
+        }).catch(function (e) { $('#t-res', d).textContent = e.message; go.disabled = false; });
+      });
+    }
+
+    function renderApps() {
+      var host = $('#adminApps');
+      host.innerHTML = '<div class="tablewrap"><table><thead><tr><th>Code</th><th>Libellé</th><th>URL</th>' +
+        '<th>Ouvert&nbsp;défaut</th><th>Actif</th></tr></thead><tbody>' +
+        APPS_.map(function (a) {
+          return '<tr data-k="' + esc(a.code) + '"><td><code>' + esc(a.code) + '</code></td>' +
+            '<td><input data-c="libelle" value="' + esc(a.libelle) + '"></td>' +
+            '<td><input data-c="url" value="' + esc(a.url || '') + '"></td>' +
+            '<td style="text-align:center"><input type="checkbox" data-c="ouvert_par_defaut" style="width:auto"' + (a.ouvert_par_defaut ? ' checked' : '') + '></td>' +
+            '<td style="text-align:center"><input type="checkbox" data-c="actif" style="width:auto"' + (a.actif ? ' checked' : '') + '></td></tr>';
+        }).join('') + '</tbody></table></div>' +
+        '<div class="row" style="margin-top:8px;gap:8px"><input id="na-code" placeholder="CODE" style="max-width:120px">' +
+        '<input id="na-lib" placeholder="Libellé" style="max-width:220px">' +
+        '<button class="small" id="na-add">+ Ajouter</button>' +
+        '<span style="flex:1"></span><button class="small primary" id="a-save">Enregistrer</button></div>';
+      $('#a-save', host).addEventListener('click', function () {
+        var byK = {};
+        host.querySelectorAll('[data-k] [data-c]').forEach(function (el) {
+          var k = el.closest('[data-k]').getAttribute('data-k'), c = el.getAttribute('data-c');
+          (byK[k] = byK[k] || {})[c] = (el.type === 'checkbox') ? el.checked : el.value;
+        });
+        var codes = Object.keys(byK);
+        setStatus('Enregistrement…');
+        Promise.all(codes.map(function (k) {
+          return rpc('admin_maj_application', { p_token: TOKEN, p_code: k, p_donnees: byK[k] });
+        })).then(function () { setStatus(''); renderAdmin(); }).catch(function (e) { setStatus(''); alert(e.message); });
+      });
+      $('#na-add', host).addEventListener('click', function () {
+        var code = ($('#na-code', host).value || '').trim().toUpperCase();
+        if (!code) return;
+        rpc('admin_maj_application', { p_token: TOKEN, p_code: code, p_donnees: { libelle: $('#na-lib', host).value || code } })
+          .then(renderAdmin).catch(function (e) { alert(e.message); });
+      });
+    }
+
+    /* ---------- démarrage : relais éventuel puis session ---------- */
+    (function start() {
+      var h = new URLSearchParams(location.search).get('h');
+      if (h) {
+        history.replaceState(null, '', location.pathname);
+        setStatus('Connexion…');
+        rpc('echanger_relais', { p_code: h, p_app: APP, p_ua: UA }).then(finalise).catch(function () {
+          setStatus(''); boot();
+        });
+        return;
+      }
+      boot();
+    })();
+  })();
+  </script>
 </body>
 </html>
