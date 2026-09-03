@@ -124,6 +124,9 @@
     .jg i.on { background: #e0a83b; } .jg i.on.s3 { background: #6bbf59; } .jg i.on.s4 { background: #3a9d3a; }
 
     .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    #tiles > .grid + .tile-grp, #tiles > .tile-grp + .tile-grp { margin-top: 22px; }
+    .tile-grp > h4 { margin: 0 0 10px 2px; font-size: 12px; font-weight: 800;
+      letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
     .tile {
       --tile: var(--accent);
       display: grid; grid-template-rows: auto auto 1fr auto; gap: 8px;
@@ -195,7 +198,7 @@
       <div id="gate"></div>
       <div id="app" class="hidden">
         <section id="view-accueil">
-          <div class="grid" id="tiles" aria-label="Applications"></div>
+          <div id="tiles" aria-label="Applications"></div>
         </section>
         <section id="view-admin" class="hidden">
           <div class="page-head"><h1>Administration</h1></div>
@@ -209,7 +212,7 @@
           <div id="adminApercu" class="hidden"></div>
         </section>
         <section id="view-gestion" class="hidden">
-          <div class="page-head"><h1>Gestion de la page</h1><p>Couleurs, police et textes du portail.</p></div>
+          <div class="page-head"><h1>Gestion de la page</h1><p>Apparence du portail (couleurs, police, textes) et tuiles (couleur, groupe, ordre).</p></div>
           <div id="gestion"></div>
         </section>
       </div>
@@ -219,7 +222,7 @@
   <dialog id="dlg"></dialog>
 
   <script>
-  var VERSION = 'v1.3.0';
+  var VERSION = 'v1.4.0';
   var FONTS = {
     'Système': '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif',
     'Inter': '"Inter", system-ui, sans-serif',
@@ -574,14 +577,25 @@
       var list = apps.filter(function (a) { return a.code !== APP && a.url; });
       var g = $('#tiles');
       if (!list.length) { g.innerHTML = '<p class="sub">Aucune application ne t\'est attribuée pour le moment.</p>'; return; }
-      g.innerHTML = list.map(function (a) {
+      function tuile(a) {
         return '<button class="tile" data-code="' + esc(a.code) + '"' +
           (a.couleur ? ' style="--tile:' + esc(a.couleur) + '"' : '') + '>' +
           '<div class="kicker">' + esc(a.kicker || 'Outil') + '</div>' +
           '<h3>' + esc(a.libelle) + '</h3>' +
           '<p>' + esc(a.description || '') + '</p>' +
           '<div class="go"><span>Ouvrir</span><span class="arrow">↗</span></div></button>';
-      }).join('');
+      }
+      // les tuiles arrivent déjà triées par `ordre` ; on les regroupe par `groupe`
+      // (sans groupe -> une grille sans titre en tête, puis un bloc par groupe)
+      var sans = list.filter(function (a) { return !a.groupe; });
+      var noms = [];
+      list.forEach(function (a) { if (a.groupe && noms.indexOf(a.groupe) < 0) noms.push(a.groupe); });
+      var html = sans.length ? '<div class="grid">' + sans.map(tuile).join('') + '</div>' : '';
+      noms.forEach(function (nom) {
+        html += '<section class="tile-grp"><h4>' + esc(nom) + '</h4><div class="grid">' +
+          list.filter(function (a) { return a.groupe === nom; }).map(tuile).join('') + '</div></section>';
+      });
+      g.innerHTML = html;
       [].forEach.call(g.querySelectorAll('[data-code]'), function (b) {
         b.addEventListener('click', function () {
           var code = b.getAttribute('data-code');
@@ -827,12 +841,12 @@
 
     function renderApps() {
       var host = $('#adminApps');
-      host.innerHTML = '<div class="tablewrap"><table><thead><tr><th>Code</th><th>Libellé</th><th>Couleur</th><th>Kicker</th>' +
+      host.innerHTML = '<p class="sub" style="margin:0 0 12px">Le « quoi » de chaque application. Couleur, groupe et ordre d\'affichage se règlent dans <b>Gestion de la page</b>.</p>' +
+        '<div class="tablewrap"><table><thead><tr><th>Code</th><th>Libellé</th><th>Kicker</th>' +
         '<th>Description</th><th>URL</th><th>Ouvert</th><th title="Relais de session ?h=">Relais</th><th>Actif</th></tr></thead><tbody>' +
         APPS_.map(function (a) {
           return '<tr data-k="' + esc(a.code) + '"><td><code>' + esc(a.code) + '</code></td>' +
             '<td><input data-c="libelle" value="' + esc(a.libelle) + '" style="min-width:110px"></td>' +
-            '<td><input type="color" data-c="couleur" value="' + esc(a.couleur || '#fcdc49') + '" style="width:44px"></td>' +
             '<td><input data-c="kicker" value="' + esc(a.kicker || '') + '" style="min-width:90px"></td>' +
             '<td><input data-c="description" value="' + esc(a.description || '') + '" style="min-width:180px"></td>' +
             '<td><input data-c="url" value="' + esc(a.url || '') + '" style="min-width:150px"></td>' +
@@ -877,22 +891,28 @@
         var groupes = [['textes', 'Textes'], ['police', 'Police'],
           ['couleurs_clair', 'Couleurs — thème clair'], ['couleurs_sombre', 'Couleurs — thème sombre']];
         var tuiles = apps.filter(function (a) { return a.code !== APP; });
+        var groupesConnus = [];
+        tuiles.forEach(function (a) { if (a.groupe && groupesConnus.indexOf(a.groupe) < 0) groupesConnus.push(a.groupe); });
         host.innerHTML = groupes.map(function (g) {
           var items = CFG.filter(function (r) { return r.groupe === g[0]; });
           if (!items.length) return '';
           return '<h3>' + esc(g[1]) + '</h3><div class="cfg-grid">' + items.map(champ).join('') + '</div>';
         }).join('') +
-          '<h3>Couleur des tuiles</h3><div class="cfg-grid">' + tuiles.map(function (a) {
-            return '<label class="cfg-item"><span>' + esc(a.libelle) + '</span>' +
-              '<span class="row" style="gap:6px"><input type="color" data-tuile="' + esc(a.code) + '" value="' + esc(a.couleur || '#fcdc49') + '" style="width:46px">' +
-              '<input type="text" data-tuilehex="' + esc(a.code) + '" value="' + esc(a.couleur || '#fcdc49') + '" style="width:100px"></span></label>';
-          }).join('') + '</div>' +
+          '<h3>Tuiles</h3>' +
+          '<p class="sub" style="margin:-2px 0 8px">Couleur, groupe (saisie libre) et ordre d\'affichage. Les tuiles sans groupe s\'affichent en premier ; sinon l\'ordre est croissant à l\'intérieur de chaque groupe.</p>' +
+          '<datalist id="dl-groupes">' + groupesConnus.map(function (x) { return '<option value="' + esc(x) + '">'; }).join('') + '</datalist>' +
+          '<div class="tablewrap"><table><thead><tr><th>Tuile</th><th>Couleur</th><th>Groupe</th><th>Ordre</th></tr></thead><tbody>' +
+          tuiles.map(function (a) {
+            return '<tr data-tk="' + esc(a.code) + '"><td>' + esc(a.libelle) + '</td>' +
+              '<td><span class="row" style="gap:6px"><input type="color" data-tuile="' + esc(a.code) + '" value="' + esc(a.couleur || '#fcdc49') + '" style="width:44px">' +
+              '<input type="text" data-tuilehex="' + esc(a.code) + '" value="' + esc(a.couleur || '#fcdc49') + '" style="width:88px"></span></td>' +
+              '<td><input type="text" data-tgroupe="' + esc(a.code) + '" list="dl-groupes" value="' + esc(a.groupe || '') + '" style="min-width:120px"></td>' +
+              '<td><input type="number" data-tordre="' + esc(a.code) + '" value="' + (a.ordre == null ? '' : esc(a.ordre)) + '" style="width:68px"></td></tr>';
+          }).join('') + '</tbody></table></div>' +
           '<p class="err" id="cfg-err"></p>' +
           '<div class="row" style="margin-top:14px;gap:8px"><button class="small" id="cfg-reset">Tout réinitialiser</button>' +
           '<span style="flex:1"></span><button class="primary" id="cfg-save">Enregistrer</button></div>';
 
-        var tuileInit = {};
-        tuiles.forEach(function (a) { tuileInit[a.code] = a.couleur || '#fcdc49'; });
         host.querySelectorAll('[data-tuilehex]').forEach(function (hx) {
           var code = hx.getAttribute('data-tuilehex'), col = host.querySelector('[data-tuile="' + code + '"]');
           hx.addEventListener('input', function () { if (/^#[0-9a-fA-F]{6}$/.test(hx.value)) col.value = hx.value; });
@@ -923,11 +943,15 @@
             var envoyer = (v === r.defaut) ? '' : v;      // = défaut -> on efface l'override
             if ((r.valeur || '') !== envoyer) ops.push(rpc('portail_config_maj', { p_token: TOKEN, p_cle: r.cle, p_valeur: envoyer }));
           });
-          host.querySelectorAll('[data-tuile]').forEach(function (col) {
-            var code = col.getAttribute('data-tuile');
-            if (col.value.toLowerCase() !== String(tuileInit[code]).toLowerCase()) {
-              ops.push(rpc('admin_maj_application', { p_token: TOKEN, p_code: code, p_donnees: { couleur: col.value } }));
-            }
+          tuiles.forEach(function (a) {
+            var col = host.querySelector('[data-tuile="' + a.code + '"]');
+            var grp = host.querySelector('[data-tgroupe="' + a.code + '"]');
+            var ord = host.querySelector('[data-tordre="' + a.code + '"]');
+            var d = {};
+            if (col && col.value.toLowerCase() !== String(a.couleur || '#fcdc49').toLowerCase()) d.couleur = col.value;
+            if (grp && (grp.value || '') !== (a.groupe || '')) d.groupe = grp.value;
+            if (ord && ord.value !== '' && Number(ord.value) !== a.ordre) d.ordre = Number(ord.value);
+            if (Object.keys(d).length) ops.push(rpc('admin_maj_application', { p_token: TOKEN, p_code: a.code, p_donnees: d }));
           });
           if (!ops.length) { $('#cfg-err', host).textContent = 'Rien à enregistrer.'; return; }
           setStatus('Enregistrement…');
