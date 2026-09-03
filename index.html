@@ -68,40 +68,53 @@
     h2.sec { margin: 0 0 14px; font-size: 18px; }
     h3 { font-size: 13px; margin: 18px 0 6px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
 
-    /* ---- shell : sidebar fixe (admin) + topbar ---- */
-    #side {
-      position: fixed; left: 0; top: 0; bottom: 0; width: 214px; z-index: 40;
-      background: var(--surface); border-right: 1px solid var(--border);
-      padding: 14px 12px; display: flex; flex-direction: column;
-    }
-    #side .side-brand { display: flex; align-items: center; gap: 9px; padding: 2px 6px 14px; font-weight: 800; }
-    #side .side-brand img { width: 30px; height: 30px; border-radius: 8px; object-fit: contain; }
-    #sideNav { display: flex; flex-direction: column; gap: 3px; }
-    #sideNav button { text-align: left; background: transparent; border: 0; padding: 9px 10px; border-radius: 8px; color: inherit; }
-    #sideNav button:hover { background: var(--surface-2); }
-    #sideNav button.active { background: var(--accent-weak); font-weight: 700; }
-    .side-foot { margin-top: auto; padding-top: 12px; font-size: 12px; color: var(--muted); }
-    #sideVersion { opacity: .7; letter-spacing: .02em; }
-
-    #shell { min-height: 100vh; transition: padding-left .15s ease; }
-    body.has-side #shell { padding-left: 214px; }
-
+    /* ---- shell : topbar + sidebar repliable (admin) ---- */
     #topbar {
-      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 12px;
-      padding: 10px 18px; background: var(--surface); border-bottom: 1px solid var(--border);
+      position: fixed; top: 0; left: 0; right: 0; z-index: 50; display: flex; align-items: center; gap: 12px;
+      height: 56px; padding: 0 16px; background: var(--surface); border-bottom: 1px solid var(--border);
     }
-    #topbar .tb-logo { width: 26px; height: 26px; border-radius: 7px; object-fit: contain; }
-    #topbar .tb-title { font-weight: 800; font-size: 14px; }
+    #topbar .tb-brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    #topbar .tb-logo { width: 30px; height: 30px; border-radius: 8px; object-fit: contain; flex: 0 0 30px; }
+    #topbar .tb-brand > div { display: grid; line-height: 1.15; min-width: 0; }
+    #topbar .tb-title { font-weight: 800; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    #topbar .tb-sub { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     #topbar .tb-spacer { flex: 1; }
-    #topbar .tb-status { font-size: 12px; color: var(--muted); max-width: 30vw; text-align: right; }
+    #topbar .tb-status { font-size: 12px; color: var(--muted); max-width: 26vw; text-align: right; overflow: hidden; }
     #who { font-size: 12px; color: var(--muted); white-space: nowrap; display: flex; align-items: center; gap: 8px; }
     #who b { color: var(--text); }
     #themeBtn { padding: 5px 9px; }
 
-    #main { padding: 22px 18px 48px; max-width: 1080px; margin: 0 auto; }
-    .page-head { margin-bottom: 18px; }
-    .page-head h1 { margin: 0; font-size: 22px; letter-spacing: -.01em; }
-    .page-head p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+    #side {
+      position: fixed; left: 0; top: 56px; bottom: 0; z-index: 40; width: 56px;
+      background: var(--surface); border-right: 1px solid var(--border);
+      padding: 10px 8px; display: flex; flex-direction: column; overflow: hidden;
+      transition: width .16s ease;
+    }
+    #side:hover, #side.open { width: 208px; box-shadow: var(--shadow); }
+    #sideNav { display: flex; flex-direction: column; gap: 3px; }
+    #sideNav button {
+      display: flex; align-items: center; gap: 12px; width: 100%; white-space: nowrap;
+      text-align: left; background: transparent; border: 0; padding: 9px 8px; border-radius: 8px; color: var(--muted);
+    }
+    #sideNav button svg { flex: 0 0 22px; width: 22px; height: 22px; }
+    #sideNav button:hover { background: var(--surface-2); color: var(--text); }
+    #sideNav button.active { background: var(--accent-weak); color: var(--text); font-weight: 700; }
+    #sideNav .lbl { opacity: 0; transition: opacity .12s; }
+    #side:hover .lbl, #side.open .lbl { opacity: 1; }
+    .side-foot { margin-top: auto; font-size: 11px; color: var(--muted); padding: 8px; white-space: nowrap; }
+    #sideVersion { opacity: .7; }
+
+    #shell { min-height: 100vh; padding-top: 56px; }
+    body.has-side #shell { padding-left: 56px; }
+
+    #main { padding: 24px 22px 56px; max-width: 1060px; margin: 0 auto; }
+    .page-head { margin-bottom: 16px; }
+    .page-head h1 { margin: 0; font-size: 21px; letter-spacing: -.01em; }
+    .page-head p { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+
+    .subtabs { display: flex; gap: 6px; margin-bottom: 16px; border-bottom: 1px solid var(--border); }
+    .subtabs button { background: transparent; border: 0; border-bottom: 2px solid transparent; padding: 8px 4px; color: var(--muted); border-radius: 0; }
+    .subtabs button.active { color: var(--text); border-bottom-color: var(--accent); font-weight: 700; }
 
     .card { max-width: 420px; margin: 5vh auto 0; padding: 24px;
       background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
@@ -112,19 +125,20 @@
 
     .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
     .tile {
+      --tile: var(--accent);
       display: grid; grid-template-rows: auto auto 1fr auto; gap: 8px;
       min-height: 150px; padding: 18px; width: 100%; text-align: left;
-      background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent);
+      background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--tile);
       border-radius: var(--radius); box-shadow: var(--shadow);
       transition: transform .15s ease, border-color .15s ease; color: inherit;
     }
-    .tile:hover, .tile:focus-visible { transform: translateY(-2px); border-color: var(--accent); outline: none; }
-    .tile .kicker { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); font-weight: 800; }
+    .tile:hover, .tile:focus-visible { transform: translateY(-2px); border-color: var(--tile); outline: none; }
+    .tile .kicker { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--tile); font-weight: 800; }
     .tile h3 { margin: 0; font-size: 19px; line-height: 1.1; color: var(--text); text-transform: none; letter-spacing: 0; }
     .tile p { margin: 0; color: var(--muted); font-size: 13px; }
-    .tile .go { display: flex; align-items: center; justify-content: space-between; font-size: 13px; font-weight: 700; color: var(--accent); }
+    .tile .go { display: flex; align-items: center; justify-content: space-between; font-size: 13px; font-weight: 700; color: var(--tile); }
     .tile .arrow { width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center;
-      background: var(--accent-weak); border: 1px solid var(--border-strong); font-size: 16px; }
+      background: color-mix(in srgb, var(--tile) 16%, transparent); border: 1px solid var(--border-strong); font-size: 16px; }
 
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
     th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
@@ -144,52 +158,60 @@
     #status { opacity: 0; transition: opacity .15s; }
     #status.on { opacity: 1; }
 
-    @media (max-width: 820px) {
-      #side { transform: translateX(-100%); transition: transform .2s ease; }
-      body.side-open #side { transform: none; }
-      body.has-side #shell { padding-left: 0; }
-      #topbar .menu-toggle { display: inline-flex; }
+    @media (max-width: 720px) {
       .grid { grid-template-columns: 1fr; }
-      #main { padding: 16px 12px 40px; }
+      #main { padding: 18px 14px 44px; }
+      #topbar .tb-sub { display: none; }
+      #side:hover, #side.open { box-shadow: 0 8px 40px rgba(0,0,0,.5); }
     }
-    #topbar .menu-toggle { display: none; }
   </style>
 </head>
 <body>
+  <header id="topbar">
+    <div class="tb-brand">
+      <img class="tb-logo" src="assets/icon-512.png" alt="">
+      <div><span class="tb-title" id="tbTitle">Soleco Apps</span><span class="tb-sub" id="tbSub">Point d'entrée des applications métiers.</span></div>
+    </div>
+    <span class="tb-spacer"></span>
+    <span class="tb-status" id="status"></span>
+    <div id="who" class="hidden"></div>
+    <button id="themeBtn" class="small" title="Thème clair / sombre" aria-label="Thème">◐</button>
+  </header>
+
   <aside id="side" class="hidden">
-    <div class="side-brand"><img src="assets/icon-512.png" alt=""><span>Soleco Apps</span></div>
     <nav id="sideNav">
-      <button data-panel="accueil" class="active">Accueil</button>
-      <button data-panel="comptes">Comptes</button>
-      <button data-panel="applications">Applications</button>
-      <button data-panel="apercu">Aperçu par compte</button>
-      <button data-panel="gestion">Gestion de la page</button>
+      <button data-panel="accueil" class="active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg><span class="lbl">Accueil</span></button>
+      <button data-panel="admin">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="lbl">Administration</span></button>
+      <button data-panel="gestion">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg><span class="lbl">Gestion de la page</span></button>
     </nav>
-    <div class="side-foot"><div id="sideVersion"></div></div>
+    <div class="side-foot"><span id="sideVersion"></span></div>
   </aside>
 
   <div id="shell">
-    <header id="topbar">
-      <button class="small menu-toggle" id="menuToggle" aria-label="Menu">☰</button>
-      <img class="tb-logo" src="assets/icon-512.png" alt="">
-      <span class="tb-title" id="tbTitle">Soleco Apps</span>
-      <span class="tb-spacer"></span>
-      <span class="tb-status" id="status"></span>
-      <div id="who" class="hidden"></div>
-      <button id="themeBtn" class="small" title="Thème clair / sombre" aria-label="Thème">◐</button>
-    </header>
-
     <main id="main">
       <div id="gate"></div>
       <div id="app" class="hidden">
         <section id="view-accueil">
-          <div class="page-head"><h1 id="heroTitle">Soleco Apps</h1><p id="heroSub">Point d'entrée des applications métiers.</p></div>
           <div class="grid" id="tiles" aria-label="Applications"></div>
         </section>
-        <section id="view-comptes" class="hidden"><div class="page-head"><h1>Comptes</h1></div><div id="adminComptes"></div></section>
-        <section id="view-applications" class="hidden"><div class="page-head"><h1>Applications</h1></div><div id="adminApps"></div></section>
-        <section id="view-apercu" class="hidden"><div class="page-head"><h1>Aperçu par compte</h1><p>Ce que verrait un compte donné en se connectant.</p></div><div id="adminApercu"></div></section>
-        <section id="view-gestion" class="hidden"><div class="page-head"><h1>Gestion de la page</h1><p>Couleurs, police et textes du portail.</p></div><div id="gestion"></div></section>
+        <section id="view-admin" class="hidden">
+          <div class="page-head"><h1>Administration</h1></div>
+          <div class="subtabs" id="adminTabs">
+            <button data-t="comptes" class="active">Comptes</button>
+            <button data-t="applications">Applications</button>
+            <button data-t="apercu">Aperçu par compte</button>
+          </div>
+          <div id="adminComptes"></div>
+          <div id="adminApps" class="hidden"></div>
+          <div id="adminApercu" class="hidden"></div>
+        </section>
+        <section id="view-gestion" class="hidden">
+          <div class="page-head"><h1>Gestion de la page</h1><p>Couleurs, police et textes du portail.</p></div>
+          <div id="gestion"></div>
+        </section>
       </div>
     </main>
   </div>
@@ -270,8 +292,8 @@
         (function () { var s = document.createElement('style'); s.id = 'cfg-css'; document.head.appendChild(s); return s; })();
       st.textContent = css;
       var t = v('titre'), sub = v('sous_titre');
-      if (t) { $('#heroTitle').textContent = t; $('#tbTitle').textContent = t; document.title = t; }
-      if (sub) $('#heroSub').textContent = sub;
+      if (t) { $('#tbTitle').textContent = t; document.title = t; }
+      if (sub) $('#tbSub').textContent = sub;
     }
     function chargerConfig() {
       return rpc('portail_config_lire', {}).then(function (rows) { CFG = rows || []; appliquerConfig(); })
@@ -330,46 +352,88 @@
       try { localStorage.removeItem(STORE); } catch (e) {}
       if (t) rpc('deconnexion', { p_token: t }).catch(function () {});
       masquerConnecte();
-      screenConnexion('Session terminée.');
+      screenLogin('Session terminée.');
     }
 
-    function screenConnexion(hint, prefill) {
+    function carte(html) {
       masquerConnecte();
       gate.classList.remove('hidden');
-      gate.innerHTML =
-        '<div class="card"><h2>Connexion</h2><p class="sub" style="margin:0 0 14px">' + esc(hint || 'Accède à tes outils Soleco.') + '</p>' +
-        '<label class="f">Identifiant</label><input id="lu" value="' + esc(prefill || '') + '" placeholder="prenom.nom@soleco.fr">' +
-        '<label class="f">Mot de passe</label><input type="password" id="lp">' +
+      gate.innerHTML = '<div class="card">' + html + '</div>';
+      return gate;
+    }
+    var _retour = null;
+
+    /* étape 1 : e-mail seul -> on route selon login_etat */
+    function screenLogin(hint, prefill) {
+      carte('<h2>Connexion</h2>' +
+        '<p class="sub" style="margin:0 0 14px">' + esc(hint || 'Accède à tes outils Soleco.') + '</p>' +
+        '<label class="f">Adresse e-mail</label><input id="lu" value="' + esc(prefill || '') + '" placeholder="prenom.nom@soleco.fr" autocomplete="username">' +
+        '<button class="primary" id="lg" style="width:100%;margin-top:14px">Continuer</button>' +
+        '<div class="err"></div>');
+      var u = $('#lu', gate);
+      function go() {
+        var l = u.value.trim();
+        if (!l) { gateErr('Adresse e-mail requise.'); return; }
+        gateErr(''); setStatus('…');
+        rpc('login_etat', { p_login: l }).then(function (r) {
+          setStatus('');
+          var e = r.etat;
+          if (e === 'mot_de_passe') screenMdp(l, r.nom);
+          else if (e === 'definir') screenDefinir(l, r.nom);
+          else if (e === 'creer') screenCreer(l);
+          else if (e === 'attente') screenMessage('Ton compte existe mais attend la validation d\'un administrateur.', l);
+          else if (e === 'inactif') gateErr('Ce compte est désactivé. Contacte un administrateur.');
+          else if (e === 'refuse') gateErr('Adresse non reconnue. Contacte un administrateur pour obtenir un accès.');
+          else gateErr('Adresse e-mail invalide.');
+        }).catch(function (e) { setStatus(''); gateErr(e.message); });
+      }
+      $('#lg', gate).addEventListener('click', go);
+      u.addEventListener('keydown', function (e) { if (e.key === 'Enter') go(); });
+      setTimeout(function () { u.focus(); }, 40);
+    }
+
+    function lienRetour() {
+      var b = $('#retour', gate);
+      if (b) b.addEventListener('click', function () { screenLogin(null, _retour); });
+    }
+
+    /* étape 2a : compte connu avec mot de passe */
+    function screenMdp(login, nom) {
+      _retour = login;
+      carte('<h2>' + esc(nom || login) + '</h2>' +
+        '<p class="sub" style="margin:0 0 12px">' + esc(login) + '</p>' +
+        '<label class="f">Mot de passe</label><input type="password" id="lp" autocomplete="current-password">' +
         '<div class="row" style="margin:12px 0;font-size:13px"><input type="checkbox" id="ll"> Rester connecté (30 jours)</div>' +
         '<button class="primary" id="lg" style="width:100%">Se connecter</button>' +
-        '<div class="err"></div>' +
-        '<p style="text-align:center;margin-top:10px"><span class="lnk" id="ld">Demander un accès</span></p></div>';
-      var u = $('#lu', gate), p = $('#lp', gate);
+        '<button id="retour" style="width:100%;margin-top:8px">‹ Changer d\'adresse</button>' +
+        '<div class="err"></div>');
+      var p = $('#lp', gate);
       function go() {
-        var l = u.value.trim(), m = p.value, lg = $('#ll', gate).checked;
-        if (!l || !m) { gateErr('Identifiant et mot de passe requis.'); return; }
+        var m = p.value, lg = $('#ll', gate).checked;
+        if (!m) { gateErr('Mot de passe requis.'); return; }
         gateErr(''); setStatus('Connexion…');
-        rpc('connexion', { p_login: l, p_mdp: m, p_app: APP, p_longue: lg, p_ua: UA }).then(function (s) {
+        rpc('connexion', { p_login: login, p_mdp: m, p_app: APP, p_longue: lg, p_ua: UA }).then(function (s) {
           setStatus('');
-          if (s && s.mdp_a_definir) { screenDefinir(s.login, s.nom, lg); return; }
+          if (s && s.mdp_a_definir) { screenDefinir(login, s.nom); return; }
           finalise(s);
         }).catch(function (e) { setStatus(''); gateErr(e.message); });
       }
       $('#lg', gate).addEventListener('click', go);
       p.addEventListener('keydown', function (e) { if (e.key === 'Enter') go(); });
-      $('#ld', gate).addEventListener('click', function () { screenDemande(u.value.trim()); });
-      setTimeout(function () { (prefill ? p : u).focus(); }, 40);
+      lienRetour();
+      setTimeout(function () { p.focus(); }, 40);
     }
 
-    function screenDefinir(login, nom, longue) {
-      gate.classList.remove('hidden');
-      gate.innerHTML =
-        '<div class="card"><h2>Créez votre mot de passe</h2>' +
+    /* étape 2b : compte validé sans mot de passe -> création */
+    function screenDefinir(login, nom) {
+      _retour = login;
+      carte('<h2>Créez votre mot de passe</h2>' +
         '<p class="sub" style="margin:0 0 6px">Compte <b>' + esc(login) + '</b> — première connexion.</p>' +
         mdpFields('d') +
-        '<div class="row" style="margin:12px 0;font-size:13px"><input type="checkbox" id="dl"' + (longue ? ' checked' : '') + '> Rester connecté (30 jours)</div>' +
+        '<div class="row" style="margin:12px 0;font-size:13px"><input type="checkbox" id="dl"> Rester connecté (30 jours)</div>' +
         '<button class="primary" id="dok" style="width:100%" disabled>Valider et se connecter</button>' +
-        '<div class="err"></div></div>';
+        '<button id="retour" style="width:100%;margin-top:8px">‹ Changer d\'adresse</button>' +
+        '<div class="err"></div>');
       var ok = $('#dok', gate);
       var c = mdpWire(gate, 'd', login, nom, function (v) { ok.disabled = !v; });
       ok.addEventListener('click', function () {
@@ -377,6 +441,36 @@
         rpc('definir_mdp_initial', { p_login: login, p_mdp: c.val(), p_app: APP, p_longue: $('#dl', gate).checked, p_ua: UA })
           .then(finalise).catch(function (e) { setStatus(''); ok.disabled = false; gateErr(e.message); });
       });
+      lienRetour();
+    }
+
+    /* étape 2c : e-mail éligible sans compte -> demande d'accès */
+    function screenCreer(login) {
+      _retour = login;
+      carte('<h2>Créer mon compte</h2>' +
+        '<p class="sub" style="margin:0 0 8px">Aucun compte pour <b>' + esc(login) + '</b>. ' +
+        'Ta demande sera transmise à un administrateur pour validation.</p>' +
+        '<label class="f">Nom et prénom</label><input id="qn" autocomplete="name">' +
+        '<button class="primary" id="qok" style="width:100%;margin-top:12px">Demander un accès</button>' +
+        '<button id="retour" style="width:100%;margin-top:8px">‹ Changer d\'adresse</button>' +
+        '<div class="err"></div>');
+      $('#qok', gate).addEventListener('click', function () {
+        setStatus('Envoi…'); gateErr('');
+        rpc('demande_acces', { p_login: login, p_nom: $('#qn', gate).value.trim(), p_ua: UA }).then(function (r) {
+          setStatus('');
+          screenMessage(r.etat === 'cree' ? 'Demande enregistrée. Un administrateur doit valider ton compte, tu pourras ensuite définir ton mot de passe.'
+            : r.etat === 'en_attente' ? 'Une demande est déjà en attente pour cette adresse.'
+            : 'Ce compte existe déjà — reconnecte-toi.', login);
+        }).catch(function (e) { setStatus(''); gateErr(e.message); });
+      });
+      lienRetour();
+    }
+
+    function screenMessage(txt, prefill) {
+      _retour = prefill || null;
+      carte('<h2>Soleco Apps</h2><p class="sub" style="margin:0 0 14px">' + esc(txt) + '</p>' +
+        '<button class="primary" id="retour" style="width:100%">‹ Retour</button>');
+      lienRetour();
     }
 
     function screenChanger(oblig) {
@@ -402,30 +496,6 @@
       var x = $('#cx', gate); if (x) x.addEventListener('click', boot);
     }
 
-    function screenDemande(prefill) {
-      gate.classList.remove('hidden');
-      gate.innerHTML =
-        '<div class="card"><h2>Demander un accès</h2>' +
-        '<p class="sub" style="margin:0 0 6px">Transmis à un administrateur pour validation. Adresses @soleco.fr ou déjà connues.</p>' +
-        '<label class="f">Adresse e-mail</label><input id="qu" value="' + esc(prefill || '') + '">' +
-        '<label class="f">Nom et prénom</label><input id="qn">' +
-        '<button class="primary" id="qok" style="width:100%">Envoyer la demande</button>' +
-        '<button id="qb" style="width:100%;margin-top:8px">Retour</button>' +
-        '<div class="err"></div></div>';
-      $('#qb', gate).addEventListener('click', function () { screenConnexion(); });
-      $('#qok', gate).addEventListener('click', function () {
-        var l = $('#qu', gate).value.trim();
-        if (!l) { gateErr('Adresse requise.'); return; }
-        gateErr(''); setStatus('Envoi…');
-        rpc('demande_acces', { p_login: l, p_nom: $('#qn', gate).value.trim(), p_ua: UA }).then(function (r) {
-          setStatus('');
-          screenConnexion(r.etat === 'cree' ? 'Demande enregistrée. Un administrateur doit valider ton compte.'
-            : r.etat === 'en_attente' ? 'Une demande est déjà en attente.'
-            : 'Ce compte existe déjà — connecte-toi.');
-        }).catch(function (e) { setStatus(''); gateErr(e.message); });
-      });
-    }
-
     function screenBlocage(msg) {
       gate.classList.remove('hidden');
       gate.innerHTML = '<div class="card"><h2>Accès refusé</h2><p class="sub" style="margin:0 0 12px">' +
@@ -436,7 +506,7 @@
 
     /* ---------- portail connecté ---------- */
     function boot() {
-      if (!TOKEN) { screenConnexion(); return; }
+      if (!TOKEN) { screenLogin(); return; }
       setStatus('Chargement…');
       rpc('session_valide', { p_token: TOKEN, p_app: APP }).then(function (s) {
         if (s.doit_changer_mdp) { CTX = s; screenChanger(true); return Promise.reject({ handled: true }); }
@@ -459,7 +529,7 @@
         var m = (e && e.message) || '';
         if (/pas acc[eè]s|acc[eè]s à cet/i.test(m)) { screenBlocage(m); }
         else if (/session/i.test(m)) { logout(); }
-        else { screenConnexion(m); }
+        else { screenLogin(m); }
       });
     }
 
@@ -478,12 +548,11 @@
     [].forEach.call(document.querySelectorAll('#sideNav button'), function (b) {
       b.addEventListener('click', function () {
         showPanel(b.getAttribute('data-panel'));
-        document.body.classList.remove('side-open');
+        $('#side').classList.remove('open');
       });
     });
-    $('#menuToggle').addEventListener('click', function () { document.body.classList.toggle('side-open'); });
     function showPanel(name) {
-      ['accueil', 'comptes', 'applications', 'apercu', 'gestion'].forEach(function (p) {
+      ['accueil', 'admin', 'gestion'].forEach(function (p) {
         var el = document.getElementById('view-' + p);
         if (el) el.classList.toggle('hidden', p !== name);
       });
@@ -492,13 +561,22 @@
       });
       if (name === 'gestion') renderGestion();
     }
+    var ADMIN_BOXES = { comptes: '#adminComptes', applications: '#adminApps', apercu: '#adminApercu' };
+    [].forEach.call(document.querySelectorAll('#adminTabs button'), function (b) {
+      b.addEventListener('click', function () {
+        var t = b.getAttribute('data-t');
+        [].forEach.call(document.querySelectorAll('#adminTabs button'), function (x) { x.classList.toggle('active', x === b); });
+        Object.keys(ADMIN_BOXES).forEach(function (k) { $(ADMIN_BOXES[k]).classList.toggle('hidden', k !== t); });
+      });
+    });
 
     function renderTiles(apps) {
       var list = apps.filter(function (a) { return a.code !== APP && a.url; });
       var g = $('#tiles');
       if (!list.length) { g.innerHTML = '<p class="sub">Aucune application ne t\'est attribuée pour le moment.</p>'; return; }
       g.innerHTML = list.map(function (a) {
-        return '<button class="tile" data-code="' + esc(a.code) + '">' +
+        return '<button class="tile" data-code="' + esc(a.code) + '"' +
+          (a.couleur ? ' style="--tile:' + esc(a.couleur) + '"' : '') + '>' +
           '<div class="kicker">' + esc(a.kicker || 'Outil') + '</div>' +
           '<h3>' + esc(a.libelle) + '</h3>' +
           '<p>' + esc(a.description || '') + '</p>' +
@@ -576,8 +654,9 @@
     }
 
     function renderComptes(users) {
+      var host = $('#adminComptes');
       var attente = users.filter(function (u) { return !u.valide; });
-      var actifs = users.filter(function (u) { return u.valide; });
+      function soc(u) { return u.contact_societe || (u.role === 'admin' ? 'Soleco (admin)' : '—'); }
       function ligne(u) {
         var badge = !u.valide ? '<span class="tag warn">à valider</span>'
           : u.bloque ? '<span class="tag warn">bloqué</span>'
@@ -585,31 +664,53 @@
         var apps = APPS_.filter(function (a) { return appAccess(u, a); }).map(function (a) { return a.code; }).join(', ');
         return '<tr data-u="' + esc(u.login) + '"><td>' + esc(u.login) + '</td>' +
           '<td>' + esc(u.contact_nom || u.nom || '') + '</td>' +
+          '<td>' + esc(soc(u)) + '</td>' +
           '<td>' + esc(u.role) + ' N' + (u.niveau || 1) + '</td><td>' + badge + '</td>' +
           '<td>' + esc(apps || (u.role === 'admin' ? 'toutes' : '—')) + '</td>' +
           '<td>' + esc(String(u.derniere_connexion_le || '').slice(0, 16).replace('T', ' ')) + '</td>' +
           '<td><button class="small" data-edit>Modifier</button></td></tr>';
       }
       function tbl(l) {
-        return '<div class="tablewrap"><table><thead><tr><th>Identifiant</th><th>Contact</th><th>Rôle</th>' +
+        l = l.slice().sort(function (a, b) {
+          var sa = soc(a).toLowerCase(), sb = soc(b).toLowerCase();
+          return sa < sb ? -1 : sa > sb ? 1 : (a.login < b.login ? -1 : 1);
+        });
+        return '<div class="tablewrap"><table><thead><tr><th>Identifiant</th><th>Contact</th><th>Société</th><th>Rôle</th>' +
           '<th>État</th><th>Applications</th><th>Dernière connexion</th><th></th></tr></thead><tbody>' +
           l.map(ligne).join('') + '</tbody></table></div>';
       }
-      var host = $('#adminComptes');
+
+      var socs = [];
+      users.forEach(function (u) { var s = soc(u); if (s !== '—' && socs.indexOf(s) < 0) socs.push(s); });
+      socs.sort();
+
+      function dessine() {
+        var f = ($('#c-soc', host) || {}).value || '';
+        var att = attente.filter(function (u) { return !f || soc(u) === f; });
+        var actifs = users.filter(function (u) { return u.valide && (!f || soc(u) === f); });
+        $('#c-corps', host).innerHTML =
+          (att.length ? '<p class="err" style="margin:0 0 6px">' + att.length + ' compte(s) en attente de validation</p>' + tbl(att) + '<div style="height:14px"></div>' : '') +
+          tbl(actifs);
+        [].forEach.call(host.querySelectorAll('#c-corps [data-u] [data-edit]'), function (b) {
+          b.addEventListener('click', function () {
+            var login = b.closest('[data-u]').getAttribute('data-u');
+            editCompte(users.filter(function (x) { return x.login === login; })[0]);
+          });
+        });
+      }
+
       host.innerHTML =
-        (attente.length ? '<p class="err" style="margin:0 0 6px">' + attente.length + ' compte(s) en attente de validation</p>' + tbl(attente) + '<div style="height:12px"></div>' : '') +
-        '<div class="row" style="margin-bottom:8px;justify-content:flex-end;gap:8px;flex-wrap:wrap">' +
+        '<div class="row" style="margin-bottom:10px;gap:8px;flex-wrap:wrap">' +
+        '<span class="sub">Société&nbsp;:</span><select id="c-soc" style="max-width:220px"><option value="">Toutes</option>' +
+        socs.map(function (s) { return '<option>' + esc(s) + '</option>'; }).join('') + '</select>' +
+        '<span style="flex:1"></span>' +
         '<button class="small" id="c-tech">Créer des comptes techniciens…</button>' +
         '<button class="small primary" id="c-new">+ Nouveau compte</button></div>' +
-        tbl(actifs);
+        '<div id="c-corps"></div>';
       $('#c-new', host).addEventListener('click', function () { editCompte(null); });
       $('#c-tech', host).addEventListener('click', modalTech);
-      [].forEach.call(host.querySelectorAll('[data-u] [data-edit]'), function (b) {
-        b.addEventListener('click', function () {
-          var login = b.closest('[data-u]').getAttribute('data-u');
-          editCompte(users.filter(function (x) { return x.login === login; })[0]);
-        });
-      });
+      $('#c-soc', host).addEventListener('change', dessine);
+      dessine();
     }
 
     function dlg(html) {
@@ -726,11 +827,12 @@
 
     function renderApps() {
       var host = $('#adminApps');
-      host.innerHTML = '<div class="tablewrap"><table><thead><tr><th>Code</th><th>Libellé</th><th>Kicker</th>' +
+      host.innerHTML = '<div class="tablewrap"><table><thead><tr><th>Code</th><th>Libellé</th><th>Couleur</th><th>Kicker</th>' +
         '<th>Description</th><th>URL</th><th>Ouvert</th><th title="Relais de session ?h=">Relais</th><th>Actif</th></tr></thead><tbody>' +
         APPS_.map(function (a) {
           return '<tr data-k="' + esc(a.code) + '"><td><code>' + esc(a.code) + '</code></td>' +
             '<td><input data-c="libelle" value="' + esc(a.libelle) + '" style="min-width:110px"></td>' +
+            '<td><input type="color" data-c="couleur" value="' + esc(a.couleur || '#fcdc49') + '" style="width:44px"></td>' +
             '<td><input data-c="kicker" value="' + esc(a.kicker || '') + '" style="min-width:90px"></td>' +
             '<td><input data-c="description" value="' + esc(a.description || '') + '" style="min-width:180px"></td>' +
             '<td><input data-c="url" value="' + esc(a.url || '') + '" style="min-width:150px"></td>' +
@@ -766,18 +868,36 @@
     function renderGestion() {
       var host = $('#gestion');
       host.innerHTML = '<p class="sub">Chargement…</p>';
-      rpc('portail_config_lire', {}).then(function (rows) {
-        CFG = rows || [];
+      Promise.all([
+        rpc('portail_config_lire', {}),
+        rpc('admin_applications', { p_token: TOKEN }).catch(function () { return []; })
+      ]).then(function (res) {
+        var rows = res[0] || [], apps = res[1] || [];
+        CFG = rows;
         var groupes = [['textes', 'Textes'], ['police', 'Police'],
           ['couleurs_clair', 'Couleurs — thème clair'], ['couleurs_sombre', 'Couleurs — thème sombre']];
+        var tuiles = apps.filter(function (a) { return a.code !== APP; });
         host.innerHTML = groupes.map(function (g) {
           var items = CFG.filter(function (r) { return r.groupe === g[0]; });
           if (!items.length) return '';
           return '<h3>' + esc(g[1]) + '</h3><div class="cfg-grid">' + items.map(champ).join('') + '</div>';
         }).join('') +
+          '<h3>Couleur des tuiles</h3><div class="cfg-grid">' + tuiles.map(function (a) {
+            return '<label class="cfg-item"><span>' + esc(a.libelle) + '</span>' +
+              '<span class="row" style="gap:6px"><input type="color" data-tuile="' + esc(a.code) + '" value="' + esc(a.couleur || '#fcdc49') + '" style="width:46px">' +
+              '<input type="text" data-tuilehex="' + esc(a.code) + '" value="' + esc(a.couleur || '#fcdc49') + '" style="width:100px"></span></label>';
+          }).join('') + '</div>' +
           '<p class="err" id="cfg-err"></p>' +
           '<div class="row" style="margin-top:14px;gap:8px"><button class="small" id="cfg-reset">Tout réinitialiser</button>' +
           '<span style="flex:1"></span><button class="primary" id="cfg-save">Enregistrer</button></div>';
+
+        var tuileInit = {};
+        tuiles.forEach(function (a) { tuileInit[a.code] = a.couleur || '#fcdc49'; });
+        host.querySelectorAll('[data-tuilehex]').forEach(function (hx) {
+          var code = hx.getAttribute('data-tuilehex'), col = host.querySelector('[data-tuile="' + code + '"]');
+          hx.addEventListener('input', function () { if (/^#[0-9a-fA-F]{6}$/.test(hx.value)) col.value = hx.value; });
+          col.addEventListener('input', function () { hx.value = col.value; });
+        });
 
         host.querySelectorAll('[data-hex]').forEach(function (hx) {
           var cle = hx.getAttribute('data-hex'), col = host.querySelector('[data-cle="' + cle + '"]');
@@ -801,17 +921,24 @@
             if (!(r.cle in cur)) return;
             var v = cur[r.cle];
             var envoyer = (v === r.defaut) ? '' : v;      // = défaut -> on efface l'override
-            if ((r.valeur || '') !== envoyer) ops.push([r.cle, envoyer]);
+            if ((r.valeur || '') !== envoyer) ops.push(rpc('portail_config_maj', { p_token: TOKEN, p_cle: r.cle, p_valeur: envoyer }));
+          });
+          host.querySelectorAll('[data-tuile]').forEach(function (col) {
+            var code = col.getAttribute('data-tuile');
+            if (col.value.toLowerCase() !== String(tuileInit[code]).toLowerCase()) {
+              ops.push(rpc('admin_maj_application', { p_token: TOKEN, p_code: code, p_donnees: { couleur: col.value } }));
+            }
           });
           if (!ops.length) { $('#cfg-err', host).textContent = 'Rien à enregistrer.'; return; }
           setStatus('Enregistrement…');
-          Promise.all(ops.map(function (o) {
-            return rpc('portail_config_maj', { p_token: TOKEN, p_cle: o[0], p_valeur: o[1] });
-          })).then(function () { setStatus(''); return chargerConfig(); }).then(renderGestion)
+          Promise.all(ops).then(function () { setStatus(''); return chargerConfig(); })
+            .then(function () { return rpc('mes_applications', { p_token: TOKEN }).then(renderTiles); })
+            .then(renderGestion)
+            .then(function () { if (CTX && CTX.role === 'admin') renderAdmin(); })
             .catch(function (e) { setStatus(''); $('#cfg-err', host).textContent = e.message; });
         });
         $('#cfg-reset', host).addEventListener('click', function () {
-          if (!confirm('Remettre toutes les couleurs, la police et les textes par défaut ?')) return;
+          if (!confirm('Remettre les couleurs, la police et les textes par défaut ? (les couleurs de tuiles ne sont pas touchées)')) return;
           setStatus('Réinitialisation…');
           rpc('portail_config_reset', { p_token: TOKEN }).then(function () { return chargerConfig(); })
             .then(function () { setStatus(''); renderGestion(); })
