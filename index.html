@@ -145,6 +145,8 @@
       </section>
 
       <div id="admin" class="hidden">
+        <h2 class="sec">Aperçu — ce que voit un compte</h2>
+        <div id="adminApercu"></div>
         <h2 class="sec">Administration — comptes</h2>
         <div id="adminComptes"></div>
         <h2 class="sec">Administration — applications</h2>
@@ -419,13 +421,53 @@
         rpc('admin_applications', { p_token: TOKEN })
       ]).then(function (res) {
         var users = res[0] || []; APPS_ = res[1] || [];
-        renderComptes(users); renderApps();
+        renderApercu(users); renderComptes(users); renderApps();
       }).catch(function (e) { $('#adminComptes').innerHTML = '<p class="err">' + esc(e.message) + '</p>'; });
     }
 
     function appAccess(u, app) {
       var o = (u.applications || {})[app.code];
       return (o === undefined) ? app.ouvert_par_defaut : o;
+    }
+
+    /* Simule le lanceur pour un compte donné (même règle que peut_acceder_app_ :
+       admin -> tout ; sinon override explicite, sinon ouvert_par_defaut). */
+    function renderApercu(users) {
+      var host = $('#adminApercu');
+      var opts = users.slice().sort(function (a, b) { return a.login < b.login ? -1 : 1; })
+        .map(function (u) {
+          return '<option value="' + esc(u.login) + '">' + esc(u.login) +
+            ' — ' + esc(u.role) + ' N' + (u.niveau || 1) + (u.valide ? '' : ' · à valider') + '</option>';
+        }).join('');
+      host.innerHTML =
+        '<div class="row" style="gap:8px"><span class="sub" style="margin:0">Voir le portail comme&nbsp;:</span>' +
+        '<select id="ap-u" style="max-width:340px">' + opts + '</select></div>' +
+        '<div id="ap-out" style="margin-top:10px"></div>';
+      function draw() {
+        var u = users.filter(function (x) { return x.login === $('#ap-u', host).value; })[0];
+        if (!u) { $('#ap-out', host).innerHTML = ''; return; }
+        var admin = u.role === 'admin';
+        var autres = APPS_.filter(function (a) { return a.code !== APP; });
+        var vis = autres.filter(function (a) { return a.actif && (admin || appAccess(u, a)); });
+        var cache = autres.filter(function (a) { return vis.indexOf(a) < 0; });
+        var rowPortail = APPS_.filter(function (a) { return a.code === APP; })[0] || { ouvert_par_defaut: true };
+        var portail = admin || appAccess(u, rowPortail);
+        function pills(list, cls) {
+          return list.length
+            ? list.map(function (a) { return '<span class="tag ' + cls + '">' + esc(a.libelle) + '</span>'; }).join(' ')
+            : '<span class="sub">—</span>';
+        }
+        $('#ap-out', host).innerHTML =
+          (u.valide ? '' : '<p class="err" style="margin:0 0 8px">Ce compte n\'est pas validé : il ne peut pas se connecter du tout.</p>') +
+          (portail ? '' : '<p class="err" style="margin:0 0 8px">Ce compte n\'a pas accès au portail lui-même (blocage à la connexion).</p>') +
+          '<p style="margin:0 0 4px"><b>Tuiles affichées</b> ' + (admin ? '<span class="sub">(admin : tout)</span>' : '') + '</p>' +
+          '<p style="margin:0 0 10px">' + pills(vis, 'ok') + '</p>' +
+          '<p style="margin:0 0 4px"><b>Masquées</b></p>' +
+          '<p style="margin:0 0 10px">' + pills(cache, '') + '</p>' +
+          '<p class="sub" style="margin:0">« Autres outils » (GMAO, Overview) : visibles par tous, ce sont de simples liens.</p>';
+      }
+      $('#ap-u', host).addEventListener('change', draw);
+      draw();
     }
     function renderComptes(users) {
       var attente = users.filter(function (u) { return !u.valide; });
